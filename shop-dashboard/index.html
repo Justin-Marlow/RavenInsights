@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WTRBA Daily Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1em;
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    h1 {
+      background: #004080;
+      color: #fff;
+      padding: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    section {
+      margin-bottom: 1em;
+    }
+
+    h2 {
+      margin-bottom: 0.5em;
+      color: #004080;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      background: #e0e0e0;
+      margin: 0.5em 0;
+      padding: 0.75em;
+      border-radius: 5px;
+    }
+
+    .reminder {
+      background: #fff3cd;
+      border: 2px solid #ffecb5;
+      color: #664d03;
+      padding: 1em;
+      border-radius: 6px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+
+    .org-structure {
+      background: #ddeeff;
+      border: 1px solid #aaccee;
+      padding: 1em;
+      border-radius: 6px;
+    }
+
+    .org-structure ul li {
+      background: #f0f4ff;
+    }
+
+    .org-structure ul li ul li {
+      background: #e8f0ff;
+      margin-left: 1em;
+    }
+
+    .contact {
+      font-size: 0.9em;
+      margin-top: 0.3em;
+      line-height: 1.4;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #842029;
+      border: 1px solid #f5c2c7;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>West Tennessee River Basin Authority</h1>
+  <p id="date"></p>
+
+  <section class="org-structure">
+    <h2>Management Structure</h2>
+    <ul>
+      <li>
+        <strong>Project Coordinator:</strong> Dustin Bennett
+        <div class="contact">
+          📧 <a href="mailto:dustin.bennett@tn.gov">dustin.bennett@tn.gov</a><br>
+          📞 1 (731) 694-5556
+        </div>
+
+        <ul>
+          <li>
+            <strong>Amphibious Supervisor:</strong> Bryan Beard
+            <div class="contact">
+              📧 <a href="mailto:bryan.beard@tn.gov">bryan.beard@tn.gov</a><br>
+              📞 1 (731) 223-1046
+            </div>
+          </li>
+
+          <li>
+            <strong>Land-Based Supervisor:</strong> Chris Jackson
+            <div class="contact">
+              📧 <a href="mailto:christopher.l.jackson@tn.gov">christopher.l.jackson@tn.gov</a><br>
+              📞 1 (731) 676-3084
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section class="reminder">
+    <h2>Reminder</h2>
+    Fridays are MANDATORY work days unless otherwise notified.
+    <br>
+    Please submit your timecard before you leave today.
+  </section>
+
+  <section>
+    <h2>Today's Assignments</h2>
+    <p class="muted" id="loadStatus">Loading assignments...</p>
+    <ul id="tasks"></ul>
+  </section>
+
+<script>
+  const today = new Date();
+
+  const yyyyMMdd = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0")
+  ].join("-");
+
+  const options = { weekday: "long", month: "long", day: "numeric" };
+  document.getElementById("date").textContent =
+    today.toLocaleDateString(undefined, options);
+
+  const sheetID = "19IpVfRqNUWQ8u5fclUgDNR-8Ns35jpFn0eS9TmsZNvc";
+
+  window.handleSheetData = function(json) {
+    const rows = json.table.rows;
+    const tasksUl = document.getElementById("tasks");
+    tasksUl.innerHTML = "";
+	
+	document.getElementById("loadStatus").style.display = "none";
+
+    let hasTasks = false;
+
+    rows.forEach(row => {
+      const date = row.c[0]?.v || "";
+      const task = row.c[1]?.v || "";
+      const equip = row.c[2]?.v || "";
+      const employee = row.c[3]?.v || "";
+
+      const normalized = normalizeDate(date);
+
+      if (normalized === yyyyMMdd) {
+        const li = document.createElement("li");
+        li.textContent = `${employee}: ${task} (${equip})`;
+        tasksUl.appendChild(li);
+        hasTasks = true;
+      }
+    });
+
+    if (!hasTasks) {
+      const li = document.createElement("li");
+      li.textContent = "No assignments scheduled for today.";
+      tasksUl.appendChild(li);
+    }
+  };
+
+  function normalizeDate(value) {
+    if (!value) return "";
+
+    if (typeof value === "string" && value.startsWith("Date(")) {
+      const parts = value.match(/Date\((\d+),(\d+),(\d+)\)/);
+
+      if (parts) {
+        const year = parts[1];
+        const month = String(Number(parts[2]) + 1).padStart(2, "0");
+        const day = String(parts[3]).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+    }
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return "";
+
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0")
+    ].join("-");
+  }
+
+  const script = document.createElement("script");
+  script.src =
+    `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=responseHandler:handleSheetData`;
+  script.onerror = function() {
+    const li = document.createElement("li");
+    li.textContent = "Error loading assignments.";
+    document.getElementById("tasks").appendChild(li);
+  };
+
+  document.body.appendChild(script);
+</script>
+</body>
+</html>
