@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raven Insights</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-soft: #1e293b;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.12), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #020617;
+      font-size: 1.4rem;
+      box-shadow: 0 10px 28px var(--shadow);
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      max-width: 820px;
+      margin-bottom: 52px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      line-height: 1;
+      margin: 0 0 18px;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1.65;
+      margin: 0 0 28px;
+      max-width: 680px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #020617;
+      border: none;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 28px 0 18px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.65);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--card-soft);
+      color: var(--accent);
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .tag {
+      color: var(--muted);
+      font-size: 0.78rem;
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      border-radius: 999px;
+      height: fit-content;
+      white-space: nowrap;
+    }
+
+    .card h3 {
+      margin: 18px 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 18px;
+    }
+
+    .card .link {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .coming-soon {
+      opacity: 0.72;
+    }
+
+    .info-strip {
+      margin-top: 18px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 18px;
+      padding: 16px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        align-items: flex-start;
+        margin-bottom: 48px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="brand" href="./">
+        <div class="logo">R</div>
+        <span>RAVEN INSIGHTS</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+        <a href="mailto:jstmarlow@gmail.com">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">AI · Analytics · Dashboards · Decision Support</div>
+        <h1>Practical AI and web tools for real-world decisions.</h1>
+        <p>
+          Raven Insights builds focused machine learning, analytics, and browser-based tools that turn raw or messy data into clear, useful insight. The goal is simple: help people understand what is happening, see what matters, and make better decisions.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#capabilities">What I Build</a>
+          <a class="button" href="#tools">View Tools</a>
+        </div>
+      </section>
+
+      <section id="capabilities">
+        <div class="section-heading">
+          <div>
+            <h2>What Raven Insights Builds</h2>
+            <p>Applied technology for operations, planning, analysis, and customer-specific problems.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div>
+              <div class="card-top">
+                <div class="icon">AI</div>
+                <span class="tag">Capability</span>
+              </div>
+              <h3>AI & Machine Learning</h3>
+              <p>
+                Custom algorithms for forecasting, classification, pattern detection, prioritization, automation, and insight generation from operational data.
+              </p>
+            </div>
+            <span class="link">Applied problem solving</span>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-top">
+                <div class="icon">▦</div>
+                <span class="tag">Capability</span>
+              </div>
+              <h3>Dashboards & Web Tools</h3>
+              <p>
+                Lightweight browser-based tools, internal dashboards, data viewers, calculators, and workflow aids designed for fast access and practical use.
+              </p>
+            </div>
+            <span class="link">Built for usability</span>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-top">
+                <div class="icon">⌁</div>
+                <span class="tag">Capability</span>
+              </div>
+              <h3>Data Analysis & Insight</h3>
+              <p>
+                Cleaning, organizing, and interpreting raw data so customers can see trends, exceptions, risks, and opportunities without digging through spreadsheets.
+              </p>
+            </div>
+            <span class="link">From data to decisions</span>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-top">
+                <div class="icon">⌖</div>
+                <span class="tag">Capability</span>
+              </div>
+              <h3>Field & Operations Technology</h3>
+              <p>
+                Practical tools for water resources, survey, restoration, shop workflows, emergency support, and other field-heavy operational environments.
+              </p>
+            </div>
+            <span class="link">Designed around the work</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="tools">
+        <div class="section-heading">
+          <div>
+            <h2>Tools & Project Demos</h2>
+            <p>Live and planned examples of practical tools hosted under Raven Insights.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <a class="card" href="va-tool/index.html">
+            <div>
+              <div class="card-top">
+                <div class="icon">★</div>
+                <span class="tag">Live</span>
+              </div>
+              <h3>VA Disability Rating Viewer</h3>
+              <p>
+                Paste VA rating JSON, view individual ratings, calculate VA math, review bilateral factors, print summaries, and create secure local backups.
+              </p>
+            </div>
+            <span class="link">Open tool →</span>
+          </a>
+
+          <a class="card" href="shop-dashboard/index.html">
+            <div>
+              <div class="card-top">
+                <div class="icon">▤</div>
+                <span class="tag">Live</span>
+              </div>
+              <h3>Shop Dashboard</h3>
+              <p>
+                A workspace for shop tools, project tracking, inventory notes, or other internal dashboard-style utilities.
+              </p>
+            </div>
+            <span class="link">Open dashboard →</span>
+          </a>
+
+          <a class="card coming-soon" href="#">
+            <div>
+              <div class="card-top">
+                <div class="icon">≋</div>
+                <span class="tag">Planned</span>
+              </div>
+              <h3>Flood & River Dashboard</h3>
+              <p>
+                A future dashboard concept for river gage data, rainfall, field notes, and decision support for water-resource work.
+              </p>
+            </div>
+            <span class="link">Coming soon</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="about" class="info-strip">
+        <strong>About Raven Insights:</strong>
+        Raven Insights is a practical technology workspace focused on AI, machine learning, analytics, dashboards, and browser-based tools. The emphasis is on lightweight, useful solutions that help turn information into decisions without unnecessary complexity.
+      </section>
+    </main>
+
+    <footer>
+      <span>© <span id="year"></span> Raven Insights</span>
+      <span>Browser-based tools for analysis, planning, and decision support.</span>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
