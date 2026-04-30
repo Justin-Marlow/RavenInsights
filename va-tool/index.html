@@ -144,6 +144,12 @@
       <div class="calc-item"><div class="calc-label">Optimized Final Rating</div><div class="calc-value" id="optimizedRounded">—</div></div>
       <div class="calc-item"><div class="calc-label">Optimization Status</div><div class="calc-value" id="optimizationStatus">—</div></div>
     </div>
+
+    <div id="bilateralReviewActions" class="mini-card no-print hidden" style="margin-top:16px;">
+      <h3>Bilateral Optimization Review</h3>
+      <p class="note">The optimized bilateral calculation produces a higher table value or final rating. Export a review summary for discussion with a VSO, accredited representative, or appropriate reviewer.</p>
+      <button id="exportBilateralReviewBtn" class="secondary">Open Bilateral Review Report</button>
+    </div>
     <h3 style="margin-top:16px;">Calculation Steps</h3>
     <div class="steps" id="calculationSteps">No calculator rows yet.</div>
   </section>
@@ -217,6 +223,7 @@
     document.getElementById("clearCalcBtn").addEventListener("click", clearCalculatorRows);
     document.getElementById("exportCsvBtn").addEventListener("click", exportCsv);
     document.getElementById("exportSummaryBtn").addEventListener("click", exportSummary);
+    document.getElementById("exportBilateralReviewBtn").addEventListener("click", exportBilateralReview);
     document.getElementById("printBtn").addEventListener("click", function(){ window.print(); });
     document.getElementById("downloadBackupBtn").addEventListener("click", downloadBackup);
     document.getElementById("importBackupBtn").addEventListener("click", function(){ document.getElementById("backupFileInput").click(); });
@@ -301,6 +308,7 @@
       document.getElementById("optimizedRounded").textContent = optimized.best.finalRating === null ? "—" : optimized.best.finalRating + "%";
       document.getElementById("optimizationStatus").textContent = optimizationLabel(standard, optimized.best);
       document.getElementById("calculationSteps").textContent = buildDisplaySteps(standard, optimized).join(String.fromCharCode(10));
+      updateBilateralReviewVisibility(standard, optimized.best);
     }
 
     function calculateTableScenario(items, bilateralIndexes) {
@@ -401,6 +409,17 @@
     function hasValidBilateralPair(items) { const ru = items.some(function(i){ return i.limb === "right_upper"; }); const lu = items.some(function(i){ return i.limb === "left_upper"; }); const rl = items.some(function(i){ return i.limb === "right_lower"; }); const ll = items.some(function(i){ return i.limb === "left_lower"; }); return (ru && lu) || (rl && ll); }
     function optimizationLabel(standard,best) { if (standard.finalRating === null) return "—"; if (best.finalRating > standard.finalRating) return "Improved"; if (best.tableValue > standard.tableValue) return "Table value improved"; return "No change"; }
 
+    function updateBilateralReviewVisibility(standard, best) {
+      const panel = document.getElementById("bilateralReviewActions");
+      if (!panel || !standard || !best || standard.finalRating === null || best.finalRating === null) {
+        if (panel) panel.classList.add("hidden");
+        return;
+      }
+
+      if (best.finalRating > standard.finalRating || best.tableValue > standard.tableValue) panel.classList.remove("hidden");
+      else panel.classList.add("hidden");
+    }
+
     function renderBodyMap() { clearBodyMapHighlights(); const groups = {}; currentRows.forEach(function(r){ if (r.decision !== "Service Connected") return; const text = (r.diagnostic_text || "") + " " + (r.diagnostic_type_name || ""); inferBodyRegions(text).forEach(function(region){ if (!groups[region]) groups[region] = []; groups[region].push(r); }); }); Object.keys(groups).forEach(function(region){ const el = document.getElementById("body-" + region); if (el) el.classList.add("active"); }); if (!Object.keys(groups).length) { document.getElementById("bodyMapDetails").textContent = "No mapped body regions found."; return; } document.getElementById("bodyMapDetails").innerHTML = Object.keys(groups).map(function(region){ return "<h4>" + escapeHtml(labelForRegion(region)) + "</h4><ul>" + groups[region].map(function(r){ return "<li>" + escapeHtml(r.diagnostic_text || r.diagnostic_type_name || "Condition") + " — " + escapeHtml(formatRating(r.rating_percentage)) + "</li>"; }).join("") + "</ul>"; }).join(""); }
     function clearBodyMapHighlights() { document.querySelectorAll(".body-part").forEach(function(el){ el.classList.remove("active"); }); }
 
@@ -408,6 +427,131 @@
     function importBackup(event) { const file = event.target.files && event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e){ try { const backup = JSON.parse(e.target.result); const rawJson = backup.raw_json || backup.json || ""; document.getElementById("vetName").value = backup.veteran_name || ""; jsonInput.value = rawJson; if (rawJson) processData(JSON.parse(rawJson)); clearCalculatorRows(false); (backup.calculator || []).forEach(function(item){ addCalculatorRow(item.name,item.rating,item.limb); }); calculateVaMath(); setStatus("Backup imported successfully."); } catch { setStatus("Could not import backup. Make sure it is a valid backup JSON file.", true); } event.target.value = ""; }; reader.readAsText(file); }
     function exportCsv() { const rows = getFilteredRows(); if (!rows.length) { setStatus("No rows to export.", true); return; } const cols = currentColumns; const csv = [cols.join(",")].concat(rows.map(function(r){ return cols.map(function(c){ return csvEscape(r[c]); }).join(","); })).join(String.fromCharCode(10)); downloadText("va-ratings.csv", csv, "text/csv"); }
     function exportSummary() { const lines = []; lines.push("VA Ratings Summary"); lines.push("Generated locally in browser"); lines.push(""); if (lastCalcResult && lastCalcResult.standard.finalRating !== null) { lines.push("Standard VA table result: " + lastCalcResult.standard.tableValue + "% → " + lastCalcResult.standard.finalRating + "%"); lines.push("Optimized result: " + lastCalcResult.optimized.best.tableValue + "% → " + lastCalcResult.optimized.best.finalRating + "%"); lines.push(""); lines.push("Calculation steps:"); lines.push(document.getElementById("calculationSteps").textContent); } else { lines.push("No calculator results available."); } downloadText("va-rating-summary.txt", lines.join(String.fromCharCode(10)), "text/plain"); }
+
+    function exportBilateralReview() {
+      if (!lastCalcResult || !lastCalcResult.standard || !lastCalcResult.optimized || lastCalcResult.standard.finalRating === null) {
+        setStatus("Run the VA math calculator before opening a bilateral review report.", true);
+        return;
+      }
+
+      const standard = lastCalcResult.standard;
+      const optimized = lastCalcResult.optimized.best;
+
+      if (!optimized || (optimized.finalRating <= standard.finalRating && optimized.tableValue <= standard.tableValue)) {
+        setStatus("Bilateral review report is only available when optimization improves the table value or final rating.", true);
+        return;
+      }
+
+      const veteranName = document.getElementById("vetName").value.trim() || "[Veteran Name]";
+      const today = new Date().toLocaleDateString();
+      const stepsText = document.getElementById("calculationSteps").textContent;
+      const finding = optimized.finalRating > standard.finalRating
+        ? "The optimized bilateral-factor calculation produced a higher final rounded evaluation than the standard bilateral-factor calculation. This suggests the rating may warrant review under the 2023 bilateral factor exception guidance."
+        : "The optimized bilateral-factor calculation produced a higher intermediate table value, although the final rounded evaluation did not change. This may still be useful for review, documentation, or discussion with an accredited representative.";
+
+      const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilateral Factor Optimization Review</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f4f6; margin: 0; padding: 24px; }
+    .page { max-width: 900px; margin: 0 auto; background: white; padding: 36px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 2px solid #1f5f8b; padding-bottom: 16px; margin-bottom: 24px; }
+    h1 { margin: 0; color: #1f5f8b; font-size: 1.8rem; }
+    h2 { color: #1f5f8b; margin-top: 28px; border-bottom: 1px solid #d1d5db; padding-bottom: 6px; }
+    p { line-height: 1.55; }
+    .meta { color: #4b5563; line-height: 1.6; }
+    .print-btn { background: #1f5f8b; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .notice { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 12px; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #eef2f7; }
+    .result-good { font-weight: bold; color: #166534; }
+    pre { background: #111827; color: #f9fafb; padding: 14px; border-radius: 8px; white-space: pre-wrap; overflow-x: auto; font-size: .9rem; }
+    footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid #d1d5db; color: #6b7280; font-size: .9rem; }
+    @media print {
+      body { background: white; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; max-width: none; padding: 24px; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <h1>Bilateral Factor Optimization Review</h1>
+        <div class="meta">
+          <strong>Veteran:</strong> ${escapeHtml(veteranName)}<br>
+          <strong>Date Generated:</strong> ${escapeHtml(today)}<br>
+          <strong>Generated By:</strong> VA Disability Ratings Viewer and Calculator
+        </div>
+      </div>
+      <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <div class="notice">
+      This document is an informational calculation aid only. It is not a VA decision, legal advice, or a substitute for review by VA or an accredited representative.
+    </div>
+
+    <h2>Purpose</h2>
+    <p>This review documents a potential bilateral factor optimization analysis for discussion with a Veteran Service Officer, accredited representative, or appropriate reviewer.</p>
+
+    <h2>Regulatory Background</h2>
+    <p>VA amended 38 CFR 4.26 in 2023 to allow one or more bilateral disabilities to be excluded from the bilateral factor calculation when including them would result in a lower combined evaluation than combining them separately. This report compares the standard bilateral-factor calculation with the most favorable optimized calculation found by this tool.</p>
+
+    <h2>Summary of Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Calculation Method</th>
+          <th>Table Value Before Final Rounding</th>
+          <th>Final VA Rounded Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Standard Bilateral Calculation</td>
+          <td>${escapeHtml(standard.tableValue)}%</td>
+          <td>${escapeHtml(standard.finalRating)}%</td>
+        </tr>
+        <tr>
+          <td>Optimized Bilateral Calculation</td>
+          <td class="result-good">${escapeHtml(optimized.tableValue)}%</td>
+          <td class="result-good">${escapeHtml(optimized.finalRating)}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Finding</h2>
+    <p>${escapeHtml(finding)}</p>
+
+    <h2>Calculation Detail</h2>
+    <pre>${escapeHtml(stepsText)}</pre>
+
+    <h2>Suggested Use</h2>
+    <p>This report may be provided to a VSO, accredited representative, or reviewer to support discussion of whether the bilateral factor exception should be considered.</p>
+
+    <footer>
+      Generated locally in the browser. No data was transmitted by this report generator.
+    </footer>
+  </div>
+</body>
+</html>`;
+
+      const reportWindow = window.open("", "_blank");
+      if (!reportWindow) {
+        setStatus("Popup blocked. Allow popups for this site to open the report.", true);
+        return;
+      }
+
+      reportWindow.document.open();
+      reportWindow.document.write(reportHtml);
+      reportWindow.document.close();
+      setStatus("Bilateral optimization review opened in a new tab.");
+    }
     function downloadText(filename,text,type) { const blob = new Blob([text], { type:type || "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url); }
     function csvEscape(value) { if (value === null || value === undefined) return ""; const s = typeof value === "object" ? JSON.stringify(value) : String(value); return '"' + s.replaceAll('"','""') + '"'; }
 
