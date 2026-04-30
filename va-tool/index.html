@@ -10,39 +10,39 @@
       --accent:#1f5f8b; --accent-text:#ffffff; --good-bg:#dcfce7; --good-text:#166534;
       --bad-bg:#fee2e2; --bad-text:#991b1b; --warn-bg:#fef3c7; --warn-text:#92400e;
       --neutral:#f3f4f6; --table-head:#eef2f7; --table-hover:#f9fafb; --code-bg:#111827; --code-text:#f9fafb;
-      --bar:#1f5f8b; --bar-bg:#e5e7eb; --body-fill:#e5e7eb; --body-active:#38bdf8;
+      --body-fill:#e5e7eb; --body-active:#38bdf8;
     }
     body.dark {
       --bg:#0f172a; --card:#111827; --text:#f9fafb; --muted:#cbd5e1; --border:#334155;
       --accent:#38bdf8; --accent-text:#082f49; --good-bg:#064e3b; --good-text:#bbf7d0;
       --bad-bg:#7f1d1d; --bad-text:#fecaca; --warn-bg:#422006; --warn-text:#fde68a;
       --neutral:#1f2937; --table-head:#1e293b; --table-hover:#1f2937; --code-bg:#020617; --code-text:#e5e7eb;
-      --bar:#38bdf8; --bar-bg:#334155; --body-fill:#334155; --body-active:#38bdf8;
+      --body-fill:#334155; --body-active:#38bdf8;
     }
     * { box-sizing:border-box; }
     body { margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text); padding:24px; }
-    h1, h2, h3 { margin-top:0; }
+    h1,h2,h3 { margin-top:0; }
     a { color:var(--accent); font-weight:bold; }
     code { background:var(--neutral); padding:2px 5px; border-radius:5px; }
-    .subtitle, .status, .note { color:var(--muted); }
+    .subtitle,.status,.note,.small { color:var(--muted); }
     .topbar { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
     .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.04); }
-    .controls, .row-controls, .filter-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-    button, input, textarea, select { font:inherit; }
+    .controls,.row-controls,.filter-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    button,input,textarea,select { font:inherit; }
     button { background:var(--accent); color:var(--accent-text); border:none; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:bold; }
     button.secondary { background:#4b5563; color:white; }
     button.danger { background:#991b1b; color:white; }
-    input, select { padding:9px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); }
+    input,select { padding:9px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); }
     input[type="text"] { min-width:260px; flex:1; }
     textarea { width:100%; min-height:180px; padding:10px; border:1px solid var(--border); border-radius:8px; resize:vertical; font-family:Consolas, monospace; font-size:.9rem; background:var(--card); color:var(--text); }
     .warning { background:var(--warn-bg); color:var(--warn-text); border:1px solid #f59e0b; padding:10px; border-radius:8px; margin-top:10px; }
-    .summary-grid, .calc-grid, .viz-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; }
-    .summary-item, .calc-item, .mini-card { border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--neutral); }
-    .summary-label, .calc-label { color:var(--muted); font-size:.9rem; }
-    .summary-value, .calc-value { font-size:1.35rem; font-weight:bold; margin-top:4px; }
+    .summary-grid,.calc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:12px; }
+    .summary-item,.calc-item,.mini-card { border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--neutral); }
+    .summary-label,.calc-label { color:var(--muted); font-size:.9rem; }
+    .summary-value,.calc-value { font-size:1.35rem; font-weight:bold; margin-top:4px; }
     .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:10px; background:var(--card); }
     table { width:100%; border-collapse:collapse; min-width:1100px; }
-    th, td { border-bottom:1px solid var(--border); padding:10px; text-align:left; vertical-align:top; font-size:.95rem; }
+    th,td { border-bottom:1px solid var(--border); padding:10px; text-align:left; vertical-align:top; font-size:.95rem; }
     th { background:var(--table-head); cursor:pointer; user-select:none; position:sticky; top:0; z-index:1; }
     tr:hover td { background:var(--table-hover); }
     .pill { display:inline-block; padding:4px 8px; border-radius:999px; font-size:.85rem; font-weight:bold; white-space:nowrap; }
@@ -51,21 +51,17 @@
     .unknown { background:var(--neutral); color:var(--text); }
     .rating { font-weight:bold; white-space:nowrap; }
     .hidden { display:none; }
-    .calc-row { display:grid; grid-template-columns:minmax(180px, 2fr) 90px 190px 120px; gap:8px; margin-bottom:8px; align-items:center; }
-    .calc-row input, .calc-row select { width:100%; }
+    .calc-row { display:grid; grid-template-columns:minmax(180px,2fr) 90px 190px 120px; gap:8px; margin-bottom:8px; align-items:center; }
+    .calc-row input,.calc-row select { width:100%; }
     .steps { background:var(--code-bg); color:var(--code-text); padding:12px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; font-family:Consolas, monospace; font-size:.9rem; }
-    .bar-row { display:grid; grid-template-columns:minmax(140px, 1.3fr) 3fr 55px; gap:8px; align-items:center; margin:8px 0; }
-    .bar-track { background:var(--bar-bg); border-radius:999px; overflow:hidden; height:18px; }
-    .bar-fill { height:100%; background:var(--bar); border-radius:999px; }
-    .small { font-size:.9rem; color:var(--muted); }
     .body-layout { display:grid; grid-template-columns:220px 1fr; gap:16px; align-items:start; }
     .body-svg svg { width:100%; max-width:220px; }
     .body-part { fill:var(--body-fill); stroke:var(--border); stroke-width:2; transition:.2s; }
     .body-part.active { fill:var(--body-active); }
     .body-list ul { margin-top:8px; padding-left:20px; }
     pre { margin:0; white-space:pre-wrap; }
-    @media (max-width:780px) { body { padding:12px; } .calc-row, .body-layout { grid-template-columns:1fr; } table { min-width:1000px; } }
-    @media print { .no-print, textarea, #jsonInput, button { display:none !important; } body { background:white; color:black; } .card { box-shadow:none; break-inside:avoid; } }
+    @media (max-width:780px) { body { padding:12px; } .calc-row,.body-layout { grid-template-columns:1fr; } table { min-width:1000px; } }
+    @media print { .no-print,textarea,#jsonInput,button { display:none !important; } body { background:white; color:black; } .card { box-shadow:none; break-inside:avoid; } }
   </style>
 </head>
 <body>
@@ -130,14 +126,12 @@
 
   <section class="card">
     <h2>Individual Ratings Table</h2>
-    <div class="table-wrap">
-      <table id="ratingsTable"><thead></thead><tbody></tbody></table>
-    </div>
+    <div class="table-wrap"><table id="ratingsTable"><thead></thead><tbody></tbody></table></div>
   </section>
 
   <section class="card">
     <h2>VA Math Calculator</h2>
-    <p class="note">Only compensable service-connected ratings are imported. For bilateral factor, select right/left upper or lower extremity where applicable. The app tries to infer limb side from condition text, but you should review it.</p>
+    <p class="note">This calculator uses VA table-style whole-number steps. The old continuous-decimal model has been removed. The optimization check tests bilateral exclusions and selects the most favorable final rating.</p>
     <div class="row-controls no-print" style="margin:12px 0;">
       <button id="importCalculatorBtn">Import Calculator Rows From Table</button>
       <button id="addCalcRowBtn" class="secondary">Add Manual Rating</button>
@@ -145,12 +139,11 @@
     </div>
     <div id="calculatorRows"></div>
     <div class="calc-grid" style="margin-top:16px;">
-      <div class="calc-item"><div class="calc-label">Actual Combined Rating</div><div class="calc-value" id="actualCombined">—</div></div>
-      <div class="calc-item"><div class="calc-label">Final VA Rounded Rating</div><div class="calc-value" id="roundedCombined">—</div></div>
-      <div class="calc-item"><div class="calc-label">Bilateral Factor Added</div><div class="calc-value" id="bilateralAdded">—</div></div>
-      <div class="calc-item"><div class="calc-label">Ratings Used</div><div class="calc-value" id="ratingsUsed">0</div></div>
+      <div class="calc-item"><div class="calc-label">Standard VA Table Result</div><div class="calc-value" id="standardRounded">—</div></div>
+      <div class="calc-item"><div class="calc-label">Standard Table Value</div><div class="calc-value" id="standardTableValue">—</div></div>
+      <div class="calc-item"><div class="calc-label">Optimized Final Rating</div><div class="calc-value" id="optimizedRounded">—</div></div>
+      <div class="calc-item"><div class="calc-label">Optimization Status</div><div class="calc-value" id="optimizationStatus">—</div></div>
     </div>
-
     <h3 style="margin-top:16px;">Calculation Steps</h3>
     <div class="steps" id="calculationSteps">No calculator rows yet.</div>
   </section>
@@ -179,6 +172,18 @@
     </div>
   </section>
 
+  <section class="card">
+    <h2>Helpful VA Links</h2>
+    <p class="note">Quick access to common VA tools and actions.</p>
+    <ul style="line-height:1.8;">
+      <li><a href="https://www.va.gov/resources/your-intent-to-file-a-va-claim/" target="_blank" rel="noopener noreferrer">Intent to File</a></li>
+      <li><a href="https://www.va.gov/disability/how-to-file-claim/" target="_blank" rel="noopener noreferrer">File a Claim</a></li>
+      <li><a href="https://www.va.gov/claim-or-appeal-status/" target="_blank" rel="noopener noreferrer">Claim Status</a></li>
+      <li><a href="https://www.va.gov/track-claims/your-claim-letters/" target="_blank" rel="noopener noreferrer">Claim Letters</a></li>
+      <li><a href="https://www.va.gov/find-forms/about-form-20-10206/" target="_blank" rel="noopener noreferrer">Request Records (FOIA / Privacy Act)</a></li>
+    </ul>
+  </section>
+
   <script>
     let currentRows = [];
     let currentColumns = [];
@@ -186,21 +191,15 @@
     let sortDirection = 1;
     let lastCalcResult = null;
 
-    const preferredColumns = ["decision", "rating_percentage", "diagnostic_text", "diagnostic_type_name", "diagnostic_type_code", "hyph_diagnostic_type_code", "effective_date", "rating_end_date", "static_ind", "disability_rating_id"];
+    const preferredColumns = ["decision","rating_percentage","diagnostic_text","diagnostic_type_name","diagnostic_type_code","hyph_diagnostic_type_code","effective_date","rating_end_date","static_ind","disability_rating_id"];
     const friendlyNames = { decision:"Decision", rating_percentage:"Rating", diagnostic_text:"Condition", diagnostic_type_name:"Diagnostic Name", diagnostic_type_code:"Code", hyph_diagnostic_type_code:"Hyphenated Code", effective_date:"Effective Date", rating_end_date:"End Date", static_ind:"Static", disability_rating_id:"Rating ID" };
-    const limbOptions = [["none", "No bilateral limb factor"], ["right_upper", "Right upper extremity"], ["left_upper", "Left upper extremity"], ["right_lower", "Right lower extremity"], ["left_lower", "Left lower extremity"]];
+    const limbOptions = [["none","No bilateral limb factor"],["right_upper","Right upper extremity"],["left_upper","Left upper extremity"],["right_lower","Right lower extremity"],["left_lower","Left lower extremity"]];
 
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") document.body.classList.add("dark");
-
     const darkModeBtn = document.getElementById("darkModeBtn");
     darkModeBtn.textContent = document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
-    darkModeBtn.addEventListener("click", function(){
-      document.body.classList.toggle("dark");
-      const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      darkModeBtn.textContent = isDark ? "Light Mode" : "Dark Mode";
-    });
+    darkModeBtn.addEventListener("click", function(){ document.body.classList.toggle("dark"); const isDark = document.body.classList.contains("dark"); localStorage.setItem("theme", isDark ? "dark" : "light"); darkModeBtn.textContent = isDark ? "Light Mode" : "Dark Mode"; });
 
     const jsonInput = document.getElementById("jsonInput");
     const statusEl = document.getElementById("status");
@@ -223,12 +222,9 @@
     document.getElementById("importBackupBtn").addEventListener("click", function(){ document.getElementById("backupFileInput").click(); });
     document.getElementById("backupFileInput").addEventListener("change", importBackup);
     searchInput.addEventListener("input", renderTable);
-    ["filterServiceConnected", "filterCompensable", "filterStatic", "filterBilateralLikely"].forEach(function(id){ document.getElementById(id).addEventListener("change", renderTable); });
+    ["filterServiceConnected","filterCompensable","filterStatic","filterBilateralLikely"].forEach(function(id){ document.getElementById(id).addEventListener("change", renderTable); });
 
-    function parsePastedJson() {
-      try { processData(JSON.parse(jsonInput.value)); }
-      catch (error) { setStatus("Could not parse JSON. Check the pasted data.", true); }
-    }
+    function parsePastedJson() { try { processData(JSON.parse(jsonInput.value)); } catch { setStatus("Could not parse JSON. Check the pasted data.", true); } }
 
     function processData(payload) {
       const attributes = payload && payload.data && payload.data.attributes ? payload.data.attributes : {};
@@ -242,30 +238,15 @@
     }
 
     function clearAllData() {
-      jsonInput.value = "";
-      currentRows = [];
-      currentColumns = [];
-      summaryCard.classList.add("hidden");
-      summaryGrid.innerHTML = "";
-      thead.innerHTML = "";
-      tbody.innerHTML = "";
-      document.getElementById("bodyMapDetails").textContent = "Load data to view mapped regions.";
-      clearBodyMapHighlights();
-      clearCalculatorRows();
-      setStatus("No data loaded.");
+      jsonInput.value = ""; currentRows = []; currentColumns = [];
+      summaryCard.classList.add("hidden"); summaryGrid.innerHTML = ""; thead.innerHTML = ""; tbody.innerHTML = "";
+      document.getElementById("bodyMapDetails").textContent = "Load data to view mapped regions."; clearBodyMapHighlights(); clearCalculatorRows(); setStatus("No data loaded.");
     }
 
-    function getDynamicColumns(rows) {
-      const discovered = new Set();
-      rows.forEach(function(row){ Object.keys(row).forEach(function(key){ discovered.add(key); }); });
-      const ordered = preferredColumns.filter(function(key){ return discovered.has(key); });
-      const extra = Array.from(discovered).filter(function(key){ return !preferredColumns.includes(key); }).sort();
-      return ordered.concat(extra);
-    }
+    function getDynamicColumns(rows) { const discovered = new Set(); rows.forEach(function(row){ Object.keys(row).forEach(function(key){ discovered.add(key); }); }); const ordered = preferredColumns.filter(function(key){ return discovered.has(key); }); const extra = Array.from(discovered).filter(function(key){ return !preferredColumns.includes(key); }).sort(); return ordered.concat(extra); }
 
     function getFilteredRows() {
-      const searchText = searchInput.value.trim().toLowerCase();
-      let rows = currentRows.slice();
+      const searchText = searchInput.value.trim().toLowerCase(); let rows = currentRows.slice();
       if (document.getElementById("filterServiceConnected").checked) rows = rows.filter(function(r){ return r.decision === "Service Connected"; });
       if (document.getElementById("filterCompensable").checked) rows = rows.filter(function(r){ return Number(r.rating_percentage) > 0; });
       if (document.getElementById("filterStatic").checked) rows = rows.filter(function(r){ return r.static_ind === true; });
@@ -277,74 +258,34 @@
 
     function renderSummary(attributes, ratings) {
       summaryCard.classList.remove("hidden");
-      const serviceConnectedCount = ratings.filter(function(r){ return r.decision === "Service Connected"; }).length;
-      const compensableCount = ratings.filter(function(r){ return r.decision === "Service Connected" && Number(r.rating_percentage) > 0; }).length;
-      const notServiceConnectedCount = ratings.filter(function(r){ return r.decision === "Not Service Connected"; }).length;
-      const summaryItems = [
-        ["Combined Rating From API", formatRating(attributes.combined_disability_rating)],
-        ["Combined Effective Date", formatValue(attributes.combined_effective_date)],
-        ["Legal Effective Date", formatValue(attributes.legal_effective_date)],
-        ["Service Connected", serviceConnectedCount],
-        ["Compensable", compensableCount],
-        ["Not Service Connected", notServiceConnectedCount],
-        ["Total Conditions", ratings.length]
-      ];
-      summaryGrid.innerHTML = summaryItems.map(function(item){ return "<div class='summary-item'><div class='summary-label'>" + escapeHtml(item[0]) + "</div><div class='summary-value'>" + escapeHtml(item[1]) + "</div></div>"; }).join("");
+      const sc = ratings.filter(function(r){ return r.decision === "Service Connected"; }).length;
+      const comp = ratings.filter(function(r){ return r.decision === "Service Connected" && Number(r.rating_percentage) > 0; }).length;
+      const nsc = ratings.filter(function(r){ return r.decision === "Not Service Connected"; }).length;
+      const items = [["Combined Rating From API", formatRating(attributes.combined_disability_rating)], ["Combined Effective Date", formatValue(attributes.combined_effective_date)], ["Legal Effective Date", formatValue(attributes.legal_effective_date)], ["Service Connected", sc], ["Compensable", comp], ["Not Service Connected", nsc], ["Total Conditions", ratings.length]];
+      summaryGrid.innerHTML = items.map(function(item){ return "<div class='summary-item'><div class='summary-label'>" + escapeHtml(item[0]) + "</div><div class='summary-value'>" + escapeHtml(item[1]) + "</div></div>"; }).join("");
     }
 
     function renderTable() {
-      let rows = getFilteredRows();
-      thead.innerHTML = "<tr>" + currentColumns.map(function(column){
-        const arrow = sortColumn === column ? (sortDirection === 1 ? " ▲" : " ▼") : "";
-        return "<th data-column='" + escapeHtml(column) + "'>" + escapeHtml(friendlyNames[column] || toTitleCase(column)) + arrow + "</th>";
-      }).join("") + "</tr>";
+      const rows = getFilteredRows();
+      thead.innerHTML = "<tr>" + currentColumns.map(function(column){ const arrow = sortColumn === column ? (sortDirection === 1 ? " ▲" : " ▼") : ""; return "<th data-column='" + escapeHtml(column) + "'>" + escapeHtml(friendlyNames[column] || toTitleCase(column)) + arrow + "</th>"; }).join("") + "</tr>";
       tbody.innerHTML = rows.map(function(row){ return "<tr>" + currentColumns.map(function(column){ return "<td>" + formatCell(column, row[column]) + "</td>"; }).join("") + "</tr>"; }).join("");
       thead.querySelectorAll("th").forEach(function(th){ th.addEventListener("click", function(){ const column = th.dataset.column; if (sortColumn === column) sortDirection *= -1; else { sortColumn = column; sortDirection = 1; } renderTable(); }); });
-    }
-
-    function renderBodyMap() {
-      clearBodyMapHighlights();
-      const groups = {};
-      currentRows.forEach(function(r){
-        if (r.decision !== "Service Connected") return;
-        const text = (r.diagnostic_text || "") + " " + (r.diagnostic_type_name || "");
-        const regions = inferBodyRegions(text);
-        regions.forEach(function(region){
-          if (!groups[region]) groups[region] = [];
-          groups[region].push(r);
-        });
-      });
-      Object.keys(groups).forEach(function(region){
-        const el = document.getElementById("body-" + region);
-        if (el) el.classList.add("active");
-      });
-      if (!Object.keys(groups).length) { document.getElementById("bodyMapDetails").textContent = "No mapped body regions found."; return; }
-      document.getElementById("bodyMapDetails").innerHTML = Object.keys(groups).map(function(region){
-        return "<h4>" + escapeHtml(labelForRegion(region)) + "</h4><ul>" + groups[region].map(function(r){ return "<li>" + escapeHtml(r.diagnostic_text || r.diagnostic_type_name || "Condition") + " — " + escapeHtml(formatRating(r.rating_percentage)) + "</li>"; }).join("") + "</ul>";
-      }).join("");
-    }
-
-    function clearBodyMapHighlights() {
-      document.querySelectorAll(".body-part").forEach(function(el){ el.classList.remove("active"); });
     }
 
     function importCalculatorRowsFromTable() {
       clearCalculatorRows(false);
       const usable = currentRows.filter(function(row){ const rating = Number(row.rating_percentage); return row.decision === "Service Connected" && Number.isFinite(rating) && rating > 0; });
       usable.forEach(function(row){ const name = row.diagnostic_text || row.diagnostic_type_name || "Service-connected condition"; const rating = Number(row.rating_percentage); const limb = inferLimbFromText((row.diagnostic_text || "") + " " + (row.diagnostic_type_name || "")); addCalculatorRow(name, rating, limb); });
-      calculateVaMath();
-      setStatus("Imported " + usable.length + " compensable service-connected rating(s) into the calculator.");
+      calculateVaMath(); setStatus("Imported " + usable.length + " compensable service-connected rating(s) into the calculator.");
     }
 
     function addCalculatorRow(name, rating, limb) {
       name = name || ""; rating = rating || ""; limb = limb || "none";
-      const row = document.createElement("div");
-      row.className = "calc-row";
+      const row = document.createElement("div"); row.className = "calc-row";
       row.innerHTML = "<input class='calc-name' type='text' placeholder='Condition name' value='" + escapeHtml(name) + "'><input class='calc-rating' type='number' min='0' max='100' step='1' placeholder='%' value='" + escapeHtml(rating) + "'><select class='calc-limb'>" + limbOptions.map(function(opt){ return "<option value='" + opt[0] + "' " + (opt[0] === limb ? "selected" : "") + ">" + opt[1] + "</option>"; }).join("") + "</select><button class='danger remove-row'>Remove</button>";
       row.querySelectorAll("input, select").forEach(function(input){ input.addEventListener("input", calculateVaMath); });
       row.querySelector(".remove-row").addEventListener("click", function(){ row.remove(); calculateVaMath(); });
-      calculatorRows.appendChild(row);
-      calculateVaMath();
+      calculatorRows.appendChild(row); calculateVaMath();
     }
 
     function clearCalculatorRows(recalculate) { if (recalculate === undefined) recalculate = true; calculatorRows.innerHTML = ""; if (recalculate) calculateVaMath(); }
@@ -352,157 +293,138 @@
 
     function calculateVaMath() {
       const items = getCalculatorItems();
-      const result = calculateCombinedWithBilateral(items);
-      lastCalcResult = result;
-      document.getElementById("actualCombined").textContent = result.actualCombined === null ? "—" : result.actualCombined.toFixed(1) + "%";
-      document.getElementById("roundedCombined").textContent = result.roundedCombined === null ? "—" : result.roundedCombined + "%";
-      document.getElementById("bilateralAdded").textContent = result.bilateralAdded.toFixed(1) + "%";
-      document.getElementById("ratingsUsed").textContent = String(items.length);
-      document.getElementById("calculationSteps").textContent = result.steps.join(String.fromCharCode(10));
+      const standard = calculateTableScenario(items, getBilateralEligibleIndexes(items));
+      const optimized = optimizeBilateral(items);
+      lastCalcResult = { standard: standard, optimized: optimized };
+      document.getElementById("standardRounded").textContent = standard.finalRating === null ? "—" : standard.finalRating + "%";
+      document.getElementById("standardTableValue").textContent = standard.tableValue === null ? "—" : standard.tableValue + "%";
+      document.getElementById("optimizedRounded").textContent = optimized.best.finalRating === null ? "—" : optimized.best.finalRating + "%";
+      document.getElementById("optimizationStatus").textContent = optimizationLabel(standard, optimized.best);
+      document.getElementById("calculationSteps").textContent = buildDisplaySteps(standard, optimized).join(String.fromCharCode(10));
     }
 
-    function calculateCombinedWithBilateral(items) {
+    function calculateTableScenario(items, bilateralIndexes) {
       const steps = [];
-      if (items.length === 0) return { actualCombined:null, roundedCombined:null, bilateralAdded:0, steps:["No compensable ratings entered."], ladder:[], bilateralItems:[], bilateralCombined:0, bilateralWithFactor:0 };
-      const upper = items.filter(function(i){ return i.limb === "right_upper" || i.limb === "left_upper"; });
-      const lower = items.filter(function(i){ return i.limb === "right_lower" || i.limb === "left_lower"; });
-      const hasUpperPair = upper.some(function(i){ return i.limb === "right_upper"; }) && upper.some(function(i){ return i.limb === "left_upper"; });
-      const hasLowerPair = lower.some(function(i){ return i.limb === "right_lower"; }) && lower.some(function(i){ return i.limb === "left_lower"; });
-      const bilateralItems = items.filter(function(i){ if (hasUpperPair && (i.limb === "right_upper" || i.limb === "left_upper")) return true; if (hasLowerPair && (i.limb === "right_lower" || i.limb === "left_lower")) return true; return false; });
-      const bilateralSet = new Set(bilateralItems);
-      const nonBilateralItems = items.filter(function(i){ return !bilateralSet.has(i); });
-      const combinedUnits = [];
-      let bilateralAdded = 0, bilateralCombined = 0, bilateralWithFactor = 0;
-      steps.push("VA math formula used: combined = A + B × (100 − A) / 100");
-      steps.push("Ratings are combined from highest to lowest."); steps.push("");
-      if (bilateralItems.length > 0) {
-        steps.push("Bilateral factor section:"); bilateralItems.sort(function(a,b){ return b.rating - a.rating; });
-        bilateralItems.forEach(function(i){ steps.push("  " + i.rating + "% - " + i.name + " (" + labelForLimb(i.limb) + ")"); });
-        bilateralCombined = combineRatings(bilateralItems.map(function(i){ return i.rating; }));
-        bilateralAdded = bilateralCombined * 0.10; bilateralWithFactor = bilateralCombined + bilateralAdded;
-        steps.push("  Combined bilateral value before factor: " + bilateralCombined.toFixed(1) + "%");
-        steps.push("  Bilateral factor added, 10% of " + bilateralCombined.toFixed(1) + ": " + bilateralAdded.toFixed(1) + "%");
-        steps.push("  Bilateral unit used in final math: " + bilateralWithFactor.toFixed(1) + "%"); steps.push("");
-        combinedUnits.push({ name:"Bilateral conditions with factor", rating:bilateralWithFactor });
-      } else { steps.push("No bilateral factor applied. To trigger it, you need at least one compensable right and one compensable left condition in the same paired group, upper or lower extremities."); steps.push(""); }
-      nonBilateralItems.forEach(function(i){ combinedUnits.push({ name:i.name, rating:i.rating }); }); combinedUnits.sort(function(a,b){ return b.rating - a.rating; });
-      steps.push("Final combination order:"); combinedUnits.forEach(function(i){ steps.push("  " + i.rating.toFixed(1) + "% - " + i.name); }); steps.push("");
-      let running = 0; const ladder = [];
-      combinedUnits.forEach(function(item, index){ const before = running; running = combineTwoRatings(running, item.rating); ladder.push({ step:index + 1, before:before, add:item.rating, after:running, name:item.name }); steps.push("Step " + (index + 1) + ": " + before.toFixed(1) + " combined with " + item.rating.toFixed(1) + " = " + running.toFixed(1) + "%"); });
-      const roundedCombined = roundVaFinal(running); steps.push(""); steps.push("Actual combined rating before final VA rounding: " + running.toFixed(1) + "%"); steps.push("Final VA rounded rating: " + roundedCombined + "%");
-      return { actualCombined:running, roundedCombined:roundedCombined, bilateralAdded:bilateralAdded, steps:steps, ladder:ladder, bilateralItems:bilateralItems, bilateralCombined:bilateralCombined, bilateralWithFactor:bilateralWithFactor };
+      if (!items.length) return { tableValue:null, finalRating:null, steps:["No compensable ratings entered."], bilateralUsed:false, groupIndexes:[] };
+      const groupItems = Array.from(bilateralIndexes).map(function(i){ return items[i]; }).filter(Boolean);
+      const validGroup = hasValidBilateralPair(groupItems);
+      const groupSet = new Set(validGroup ? Array.from(bilateralIndexes) : []);
+      const units = [];
+      let bilateralBase = null, bilateralAdded = 0, bilateralUnitRaw = null, bilateralUnit = null;
+
+      steps.push("VA Table Mode: each combination step is converted to a whole-number table value.");
+      steps.push("Final whole-number table value is rounded to the nearest 10%.");
+      steps.push("");
+
+      if (validGroup) {
+        const sortedGroup = groupItems.slice().sort(function(a,b){ return b.rating - a.rating; });
+        steps.push("Bilateral factor section:");
+        sortedGroup.forEach(function(i){ steps.push("  " + i.rating + "% - " + i.name + " (" + labelForLimb(i.limb) + ")"); });
+        const groupRatings = sortedGroup.map(function(i){ return i.rating; });
+        const groupResult = combineRatingsTable(groupRatings);
+        bilateralBase = groupResult.value;
+        groupResult.steps.forEach(function(s){ steps.push("  " + s); });
+        bilateralAdded = bilateralBase * 0.10;
+        bilateralUnitRaw = bilateralBase + bilateralAdded;
+        bilateralUnit = Math.round(bilateralUnitRaw);
+        steps.push("  Bilateral combined value: " + bilateralBase + "%");
+        steps.push("  Bilateral factor added, 10% of " + bilateralBase + ": " + bilateralAdded.toFixed(1) + "%");
+        steps.push("  Bilateral unit before table continuation: " + bilateralUnitRaw.toFixed(1) + "% → " + bilateralUnit + "%");
+        steps.push("");
+        units.push({ name:"Bilateral conditions with factor", rating:bilateralUnit });
+      } else if (groupItems.length) {
+        steps.push("No valid bilateral group formed for this scenario; selected conditions are combined separately.");
+        steps.push("");
+      } else {
+        steps.push("No bilateral factor applied in this scenario.");
+        steps.push("");
+      }
+
+      items.forEach(function(item, index){ if (!groupSet.has(index)) units.push({ name:item.name, rating:item.rating }); });
+      units.sort(function(a,b){ return b.rating - a.rating; });
+      steps.push("Final combination order:"); units.forEach(function(u){ steps.push("  " + u.rating + "% - " + u.name); }); steps.push("");
+      const finalResult = combineUnitsTable(units);
+      finalResult.steps.forEach(function(s){ steps.push(s); });
+      steps.push(""); steps.push("Whole-number table value before final VA rounding: " + finalResult.value + "%");
+      const finalRating = finalVaRound(finalResult.value);
+      steps.push("Final VA rounded rating: " + finalRating + "%");
+
+      return { tableValue:finalResult.value, finalRating:finalRating, steps:steps, bilateralUsed:validGroup, groupIndexes:Array.from(groupSet), bilateralBase:bilateralBase, bilateralAdded:bilateralAdded, bilateralUnitRaw:bilateralUnitRaw, bilateralUnit:bilateralUnit };
     }
 
-    function combineRatings(ratings) { return ratings.slice().sort(function(a,b){ return b - a; }).reduce(function(combined, rating){ return combineTwoRatings(combined, rating); }, 0); }
-    function combineTwoRatings(a, b) { return a + b * (100 - a) / 100; }
-    function roundVaFinal(value) { if (value >= 95) return 100; return Math.round(value / 10) * 10; }
+    function optimizeBilateral(items) {
+      if (!items.length) return { best: calculateTableScenario(items, new Set()), scenarios: [] };
+      const eligible = getBilateralEligibleIndexes(items);
+      const eligibleArray = Array.from(eligible);
+      const scenarios = [];
+      const maxMasks = Math.pow(2, eligibleArray.length);
+      for (let mask = 0; mask < maxMasks; mask++) {
+        const subset = new Set();
+        for (let i = 0; i < eligibleArray.length; i++) if (mask & (1 << i)) subset.add(eligibleArray[i]);
+        const scenario = calculateTableScenario(items, subset);
+        scenarios.push(scenario);
+      }
+      scenarios.sort(function(a,b){
+        if ((b.finalRating || 0) !== (a.finalRating || 0)) return (b.finalRating || 0) - (a.finalRating || 0);
+        return (b.tableValue || 0) - (a.tableValue || 0);
+      });
+      return { best: scenarios[0], scenarios: scenarios };
+    }
 
-    function inferLimbFromText(text) { const lower = text.toLowerCase(); const hasRight = lower.includes("right"); const hasLeft = lower.includes("left"); const hasUpper = ["upper extremity", "arm", "shoulder", "elbow", "forearm", "wrist", "hand", "finger"].some(function(word){ return lower.includes(word); }); const hasLower = ["lower extremity", "leg", "hip", "thigh", "knee", "ankle", "foot", "feet", "toe", "sciatic", "femoral"].some(function(word){ return lower.includes(word); }); if (hasRight && hasUpper) return "right_upper"; if (hasLeft && hasUpper) return "left_upper"; if (hasRight && hasLower) return "right_lower"; if (hasLeft && hasLower) return "left_lower"; return "none"; }
+    function buildDisplaySteps(standard, optimized) {
+      const out = [];
+      out.push("STANDARD VA TABLE RESULT"); out.push("========================"); out.push.apply(out, standard.steps);
+      out.push(""); out.push("BILATERAL OPTIMIZATION CHECK"); out.push("============================");
+      if (!optimized.best || optimized.best.finalRating === null) { out.push("No ratings entered."); return out; }
+      out.push("Standard result: " + standard.tableValue + "% → " + standard.finalRating + "%");
+      out.push("Best optimized result: " + optimized.best.tableValue + "% → " + optimized.best.finalRating + "%");
+      if (optimized.best.finalRating > standard.finalRating) out.push("Result: Optimization improves the final rating.");
+      else if (optimized.best.tableValue > standard.tableValue) out.push("Result: Optimization improves the table value but not the final rounded rating.");
+      else out.push("Result: Standard bilateral calculation is already most favorable or tied.");
+      out.push(""); out.push("BEST OPTIMIZED SCENARIO STEPS"); out.push("============================="); out.push.apply(out, optimized.best.steps);
+      return out;
+    }
+
+    function combineRatingsTable(ratings) {
+      const sorted = ratings.slice().sort(function(a,b){ return b - a; });
+      if (!sorted.length) return { value:0, steps:[] };
+      let running = sorted[0]; const steps = ["Start with " + running + "%"];
+      for (let i = 1; i < sorted.length; i++) { const before = running; running = combineTwoTable(running, sorted[i]); steps.push(before + "% + " + sorted[i] + "% = " + running + "%"); }
+      return { value:running, steps:steps };
+    }
+
+    function combineUnitsTable(units) { return combineRatingsTable(units.map(function(u){ return Number(u.rating); })); }
+    function combineTwoTable(a,b) { return Math.round(a + b * (100 - a) / 100); }
+    function finalVaRound(value) { if (value === null) return null; if (value >= 95) return 100; return Math.round(value / 10) * 10; }
+
+    function getBilateralEligibleIndexes(items) { const s = new Set(); items.forEach(function(item, idx){ if (item.limb !== "none") s.add(idx); }); return s; }
+    function hasValidBilateralPair(items) { const ru = items.some(function(i){ return i.limb === "right_upper"; }); const lu = items.some(function(i){ return i.limb === "left_upper"; }); const rl = items.some(function(i){ return i.limb === "right_lower"; }); const ll = items.some(function(i){ return i.limb === "left_lower"; }); return (ru && lu) || (rl && ll); }
+    function optimizationLabel(standard,best) { if (standard.finalRating === null) return "—"; if (best.finalRating > standard.finalRating) return "Improved"; if (best.tableValue > standard.tableValue) return "Table value improved"; return "No change"; }
+
+    function renderBodyMap() { clearBodyMapHighlights(); const groups = {}; currentRows.forEach(function(r){ if (r.decision !== "Service Connected") return; const text = (r.diagnostic_text || "") + " " + (r.diagnostic_type_name || ""); inferBodyRegions(text).forEach(function(region){ if (!groups[region]) groups[region] = []; groups[region].push(r); }); }); Object.keys(groups).forEach(function(region){ const el = document.getElementById("body-" + region); if (el) el.classList.add("active"); }); if (!Object.keys(groups).length) { document.getElementById("bodyMapDetails").textContent = "No mapped body regions found."; return; } document.getElementById("bodyMapDetails").innerHTML = Object.keys(groups).map(function(region){ return "<h4>" + escapeHtml(labelForRegion(region)) + "</h4><ul>" + groups[region].map(function(r){ return "<li>" + escapeHtml(r.diagnostic_text || r.diagnostic_type_name || "Condition") + " — " + escapeHtml(formatRating(r.rating_percentage)) + "</li>"; }).join("") + "</ul>"; }).join(""); }
+    function clearBodyMapHighlights() { document.querySelectorAll(".body-part").forEach(function(el){ el.classList.remove("active"); }); }
+
+    function downloadBackup() { const nameInput = document.getElementById("vetName").value.trim(); const safeName = nameInput ? nameInput.replace(/[^a-z0-9]/gi,"_").toLowerCase() : "va_session"; const date = new Date().toISOString().split("T")[0]; const filename = safeName + "_va_session_" + date + ".json"; const sessionData = { app:"VA Disability Ratings Viewer and Calculator", version:"2.0-table-mode", exported_at:new Date().toISOString(), veteran_name:nameInput, raw_json:jsonInput.value, calculator:getCalculatorItems() }; downloadText(filename, JSON.stringify(sessionData,null,2), "application/json"); setStatus("Backup downloaded. Store it securely."); }
+    function importBackup(event) { const file = event.target.files && event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e){ try { const backup = JSON.parse(e.target.result); const rawJson = backup.raw_json || backup.json || ""; document.getElementById("vetName").value = backup.veteran_name || ""; jsonInput.value = rawJson; if (rawJson) processData(JSON.parse(rawJson)); clearCalculatorRows(false); (backup.calculator || []).forEach(function(item){ addCalculatorRow(item.name,item.rating,item.limb); }); calculateVaMath(); setStatus("Backup imported successfully."); } catch { setStatus("Could not import backup. Make sure it is a valid backup JSON file.", true); } event.target.value = ""; }; reader.readAsText(file); }
+    function exportCsv() { const rows = getFilteredRows(); if (!rows.length) { setStatus("No rows to export.", true); return; } const cols = currentColumns; const csv = [cols.join(",")].concat(rows.map(function(r){ return cols.map(function(c){ return csvEscape(r[c]); }).join(","); })).join(String.fromCharCode(10)); downloadText("va-ratings.csv", csv, "text/csv"); }
+    function exportSummary() { const lines = []; lines.push("VA Ratings Summary"); lines.push("Generated locally in browser"); lines.push(""); if (lastCalcResult && lastCalcResult.standard.finalRating !== null) { lines.push("Standard VA table result: " + lastCalcResult.standard.tableValue + "% → " + lastCalcResult.standard.finalRating + "%"); lines.push("Optimized result: " + lastCalcResult.optimized.best.tableValue + "% → " + lastCalcResult.optimized.best.finalRating + "%"); lines.push(""); lines.push("Calculation steps:"); lines.push(document.getElementById("calculationSteps").textContent); } else { lines.push("No calculator results available."); } downloadText("va-rating-summary.txt", lines.join(String.fromCharCode(10)), "text/plain"); }
+    function downloadText(filename,text,type) { const blob = new Blob([text], { type:type || "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url); }
+    function csvEscape(value) { if (value === null || value === undefined) return ""; const s = typeof value === "object" ? JSON.stringify(value) : String(value); return '"' + s.replaceAll('"','""') + '"'; }
+
+    function inferLimbFromText(text) { const lower = text.toLowerCase(); const hasRight = lower.includes("right"); const hasLeft = lower.includes("left"); const hasUpper = ["upper extremity","arm","shoulder","elbow","forearm","wrist","hand","finger"].some(function(word){ return lower.includes(word); }); const hasLower = ["lower extremity","leg","hip","thigh","knee","ankle","foot","feet","toe","sciatic","femoral"].some(function(word){ return lower.includes(word); }); if (hasRight && hasUpper) return "right_upper"; if (hasLeft && hasUpper) return "left_upper"; if (hasRight && hasLower) return "right_lower"; if (hasLeft && hasLower) return "left_lower"; return "none"; }
     function inferBodyRegions(text) { const lower = text.toLowerCase(); const regions = []; const limb = inferLimbFromText(text); if (limb !== "none") regions.push(limb); if (lower.includes("spine") || lower.includes("lumbar") || lower.includes("cervical") || lower.includes("back") || lower.includes("disc")) regions.push("spine"); if (lower.includes("head") || lower.includes("migraine") || lower.includes("tinnitus") || lower.includes("hearing") || lower.includes("ear")) regions.push("head"); if (lower.includes("foot") || lower.includes("feet")) regions.push(lower.includes("left") ? "left_foot" : lower.includes("right") ? "right_foot" : "right_foot"); if (lower.includes("chest") || lower.includes("abdomen") || lower.includes("stomach")) regions.push("torso"); return Array.from(new Set(regions)); }
     function labelForRegion(region) { return { head:"Head / Hearing", torso:"Torso", spine:"Spine / Back", right_upper:"Right Upper Extremity", left_upper:"Left Upper Extremity", right_lower:"Right Lower Extremity", left_lower:"Left Lower Extremity", right_foot:"Right Foot", left_foot:"Left Foot" }[region] || region; }
     function labelForLimb(limb) { const found = limbOptions.find(function(opt){ return opt[0] === limb; }); return found ? found[1] : "No bilateral limb factor"; }
-
-    function downloadBackup() {
-      const nameInput = document.getElementById("vetName").value.trim();
-      const safeName = nameInput ? nameInput.replace(/[^a-z0-9]/gi, "_").toLowerCase() : "va_session";
-      const date = new Date().toISOString().split("T")[0];
-      const filename = safeName + "_va_session_" + date + ".json";
-
-      const sessionData = {
-        app: "VA Disability Ratings Viewer and Calculator",
-        version: "1.0",
-        exported_at: new Date().toISOString(),
-        veteran_name: nameInput,
-        raw_json: jsonInput.value,
-        calculator: getCalculatorItems()
-      };
-
-      downloadText(filename, JSON.stringify(sessionData, null, 2), "application/json");
-      setStatus("Backup downloaded. Store it securely.");
-    }
-
-    function importBackup(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const backup = JSON.parse(e.target.result);
-          const rawJson = backup.raw_json || backup.json || "";
-
-          document.getElementById("vetName").value = backup.veteran_name || "";
-          jsonInput.value = rawJson;
-
-          if (rawJson) {
-            processData(JSON.parse(rawJson));
-          }
-
-          clearCalculatorRows(false);
-          (backup.calculator || []).forEach(function(item){
-            addCalculatorRow(item.name, item.rating, item.limb);
-          });
-
-          calculateVaMath();
-          setStatus("Backup imported successfully.");
-        } catch (error) {
-          setStatus("Could not import backup. Make sure it is a valid backup JSON file.", true);
-        }
-
-        event.target.value = "";
-      };
-
-      reader.readAsText(file);
-    }
-
-    function exportCsv() { const rows = getFilteredRows(); if (!rows.length) { setStatus("No rows to export.", true); return; } const cols = currentColumns; const csv = [cols.join(",")].concat(rows.map(function(r){ return cols.map(function(c){ return csvEscape(r[c]); }).join(","); })).join(String.fromCharCode(10)); downloadText("va-ratings.csv", csv); }
-    function exportSummary() { const lines = []; lines.push("VA Ratings Summary"); lines.push("Generated locally in browser"); lines.push(""); if (lastCalcResult && lastCalcResult.actualCombined !== null) { lines.push("Actual combined rating: " + lastCalcResult.actualCombined.toFixed(1) + "%"); lines.push("Final rounded rating: " + lastCalcResult.roundedCombined + "%"); lines.push("Bilateral factor added: " + lastCalcResult.bilateralAdded.toFixed(1) + "%"); lines.push(""); lines.push("Calculation steps:"); lines.push(lastCalcResult.steps.join(String.fromCharCode(10))); } else { lines.push("No calculator results available."); } downloadText("va-rating-summary.txt", lines.join(String.fromCharCode(10))); }
-    function downloadText(filename, text, type) { const blob = new Blob([text], { type:type || "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url); }
-    function csvEscape(value) { if (value === null || value === undefined) return ""; const s = typeof value === "object" ? JSON.stringify(value) : String(value); return '"' + s.replaceAll('"', '""') + '"'; }
-
-    function formatCell(column, value) { if (column === "decision") { const className = value === "Service Connected" ? "service-connected" : value === "Not Service Connected" ? "not-service-connected" : "unknown"; return "<span class='pill " + className + "'>" + escapeHtml(formatValue(value)) + "</span>"; } if (column === "rating_percentage") return "<span class='rating'>" + escapeHtml(formatRating(value)) + "</span>"; if (typeof value === "boolean") return value ? "Yes" : "No"; if (typeof value === "object" && value !== null) return "<pre>" + escapeHtml(JSON.stringify(value, null, 2)) + "</pre>"; return escapeHtml(formatValue(value)); }
+    function formatCell(column,value) { if (column === "decision") { const className = value === "Service Connected" ? "service-connected" : value === "Not Service Connected" ? "not-service-connected" : "unknown"; return "<span class='pill " + className + "'>" + escapeHtml(formatValue(value)) + "</span>"; } if (column === "rating_percentage") return "<span class='rating'>" + escapeHtml(formatRating(value)) + "</span>"; if (typeof value === "boolean") return value ? "Yes" : "No"; if (typeof value === "object" && value !== null) return "<pre>" + escapeHtml(JSON.stringify(value,null,2)) + "</pre>"; return escapeHtml(formatValue(value)); }
     function formatRating(value) { if (value === null || value === undefined || value === "") return "—"; return value + "%"; }
     function formatValue(value) { if (value === null || value === undefined || value === "") return "—"; return String(value); }
     function compareValues(a,b) { if (a === null || a === undefined) return 1; if (b === null || b === undefined) return -1; const an = Number(a); const bn = Number(b); if (!Number.isNaN(an) && !Number.isNaN(bn)) return an - bn; return String(a).localeCompare(String(b)); }
     function toTitleCase(value) { return value.split("_").map(function(word){ return word.charAt(0).toUpperCase() + word.slice(1); }).join(" "); }
-    function escapeHtml(value) { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
-    function shorten(value, max) { value = String(value); return value.length > max ? value.slice(0, max - 1) + "…" : value; }
-    function setStatus(message, isError) { statusEl.textContent = message; statusEl.style.color = isError ? "#991b1b" : "var(--muted)"; }
+    function escapeHtml(value) { return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+    function setStatus(message,isError) { statusEl.textContent = message; statusEl.style.color = isError ? "#991b1b" : "var(--muted)"; }
 
     renderTable();
     calculateVaMath();
   </script>
-  <section class="card">
-      <h2>Helpful VA Links</h2>
-        <p class="note">Quick access to common VA tools and actions.</p>
-
-          <ul style="line-height: 1.8;">
-              <li>
-                    <a href="https://www.va.gov/resources/your-intent-to-file-a-va-claim/" target="_blank">
-                            Intent to File
-                                  </a>
-                                      </li>
-                                          <li>
-                                                <a href="https://www.va.gov/disability/how-to-file-claim/" target="_blank">
-                                                        File a Claim
-                                                              </a>
-                                                                  </li>
-                                                                      <li>
-                                                                            <a href="https://www.va.gov/claim-or-appeal-status/" target="_blank">
-                                                                                    Claim Status
-                                                                                          </a>
-                                                                                              </li>
-                                                                                                  <li>
-                                                                                                        <a href="https://www.va.gov/track-claims/your-claim-letters/" target="_blank">
-                                                                                                                Claim Letters
-                                                                                                                      </a>
-                                                                                                                          </li>
-                                                                                                                              <li>
-                                                                                                                                    <a href="https://www.va.gov/find-forms/about-form-20-10206/" target="_blank">
-                                                                                                                                            Request Records (FOIA / Privacy Act)
-                                                                                                                                                  </a>
-                                                                                                                                                      </li>
-                                                                                                                                                        </ul>
-                                                                                                                                                        </section>
 </body>
 </html>
