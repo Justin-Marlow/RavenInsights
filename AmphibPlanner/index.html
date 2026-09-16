@@ -502,19 +502,30 @@
           </div>
 
           <div class="destination-wrap">
+            <label>
+              <span class="label">Starting Location</span>
+              <input id="startingLocation" type="text"
+                placeholder="Shop, office, hotel, staging area…" />
+            </label>
+            <div class="map-message">
+              Your normal starting location loads automatically, but it can be changed for any day.
+            </div>
+          </div>
+
+          <div class="destination-wrap">
             <span class="label">Destination / Job Site</span>
             <div id="placeHolder">
               <input id="destinationFallback" type="text"
                 placeholder="Google destination search loads after API setup…" disabled />
             </div>
             <div id="routeHelp" class="map-message">
-              Set your Google Maps API key and starting address in the CONFIG section near the bottom of this file.
+              Set your Google Maps API key and default starting address in the CONFIG section near the bottom of this file.
             </div>
           </div>
 
           <div class="config-note">
             <strong>One-time setup:</strong> edit <code>GOOGLE_MAPS_API_KEY</code> and
-            <code>STARTING_LOCATION</code> in this file. Restrict the key to your GitHub Pages domain.
+            <code>DEFAULT_STARTING_LOCATION</code> in this file. The supervisor can still change the starting location on the page.
           </div>
         </section>
 
@@ -656,11 +667,12 @@
       ============================================================
     */
     const CONFIG = {
-      GOOGLE_MAPS_API_KEY: AIzaSyBveh72-EjsDWprU7S7ltwg3rGSo0baZdM,
+      GOOGLE_MAPS_API_KEY: "AIzaSyC50CEKZ5pRO7hvELhNZQue-bPh6GC6omg",
 
-      // Use a street address Google can route from.
+      // This loads into the Starting Location box automatically.
+      // The supervisor can change it on the page for any day.
       // Example: "123 Main St, Trenton, TN 38382"
-      STARTING_LOCATION: "YOUR SHOP OR OFFICE ADDRESS",
+      DEFAULT_STARTING_LOCATION: "3628 Eastend Dr. Humboldt, TN 38343",
 
       // Optional: restrict autocomplete suggestions to the U.S.
       REGION_CODE: "us"
@@ -684,7 +696,8 @@
       moveMachine: $("moveMachine"),
       lunch: $("lunch"),
       returnTravel: $("returnTravel"),
-      notes: $("notes")
+      notes: $("notes"),
+      startingLocation: $("startingLocation")
     };
 
     let map = null;
@@ -854,11 +867,19 @@
       updatePrintFields();
     }
 
+    function configuredDefaultStart() {
+      const value = String(CONFIG.DEFAULT_STARTING_LOCATION || "").trim();
+      if (!value || value.includes("YOUR NORMAL SHOP")) return "";
+      return value;
+    }
+
+    function currentStartingLocation() {
+      return String(controls.startingLocation.value || "").trim();
+    }
+
     function mapsConfigured() {
       return CONFIG.GOOGLE_MAPS_API_KEY &&
-        !CONFIG.GOOGLE_MAPS_API_KEY.includes("PASTE_YOUR") &&
-        CONFIG.STARTING_LOCATION &&
-        !CONFIG.STARTING_LOCATION.includes("YOUR SHOP");
+        !CONFIG.GOOGLE_MAPS_API_KEY.includes("PASTE_YOUR");
     }
 
     function clearRouteGraphics() {
@@ -878,8 +899,13 @@
       $("routeHelp").textContent = "Calculating route from the configured starting location…";
 
       try {
+        const origin = currentStartingLocation();
+        if (!origin) {
+          throw new Error("Enter a starting location before calculating the route.");
+        }
+
         const request = {
-          origin: CONFIG.STARTING_LOCATION,
+          origin,
           destination: selectedDestination.location,
           travelMode: "DRIVING",
           routingPreference: "TRAFFIC_AWARE",
@@ -892,7 +918,7 @@
         } catch (fieldError) {
           // Compatibility fallback if durationMillis is not available in a given release.
           result = await RouteClass.computeRoutes({
-            origin: CONFIG.STARTING_LOCATION,
+            origin,
             destination: selectedDestination.location,
             travelMode: "DRIVING",
             routingPreference: "TRAFFIC_AWARE",
@@ -918,7 +944,7 @@
 
         $("driveTime").textContent = formatDuration(driveMinutes);
         $("distance").textContent = formatDistance(route.distanceMeters);
-        $("routeLabel").textContent = `${CONFIG.STARTING_LOCATION} → ${destinationText}`;
+        $("routeLabel").textContent = `${origin} → ${destinationText}`;
         $("routeHelp").textContent =
           "Travel-to-site and return travel were populated from Google. You can still override either value.";
 
@@ -1017,8 +1043,10 @@
           }
         });
 
-        $("routeHelp").textContent =
-          `Start point: ${CONFIG.STARTING_LOCATION}. Search for the job site above.`;
+        const startText = currentStartingLocation();
+        $("routeHelp").textContent = startText
+          ? `Start point: ${startText}. Search for the job site above.`
+          : "Enter a starting location, then search for the job site above.";
         $("status").textContent = "Select Site";
       } catch (error) {
         console.error(error);
@@ -1069,6 +1097,22 @@
       control.addEventListener("input", recalc);
     });
 
+    controls.startingLocation.addEventListener("change", async () => {
+      if (selectedDestination && RouteClass && currentStartingLocation()) {
+        await calculateRoute();
+      } else if (currentStartingLocation()) {
+        $("routeHelp").textContent =
+          `Start point: ${currentStartingLocation()}. Search for the job site above.`;
+      }
+    });
+
+    controls.startingLocation.addEventListener("keydown", async (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        controls.startingLocation.blur();
+      }
+    });
+
     $("resetBtn").addEventListener("click", () => {
       controls.startTime.value = "06:30";
       controls.endTime.value = "16:30";
@@ -1079,6 +1123,7 @@
       controls.lunch.value = "30";
       controls.returnTravel.value = "0";
       controls.notes.value = "";
+      controls.startingLocation.value = configuredDefaultStart();
       selectedDestination = null;
       destinationText = "";
       routeWasAutoFilled = false;
@@ -1099,6 +1144,7 @@
     });
 
     initDate();
+    controls.startingLocation.value = configuredDefaultStart();
     recalc();
     loadGoogleMaps();
   </script>
