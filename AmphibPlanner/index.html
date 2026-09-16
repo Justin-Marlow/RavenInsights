@@ -368,15 +368,6 @@
       cursor: not-allowed;
     }
 
-    .config-note {
-      border-left: 4px solid var(--accent);
-      padding: 10px 12px;
-      background: #f6faf8;
-      margin-top: 12px;
-      font-size: .88rem;
-      color: var(--muted);
-    }
-
     .print-only { display: none; }
 
     .route-error {
@@ -489,7 +480,7 @@
             </label>
             <label>
               <span class="label">Crew / Supervisor</span>
-              <input id="crew" type="text" placeholder="Crew A / Smith" />
+              <input id="crew" type="text" placeholder="Crew A" />
             </label>
             <label>
               <span class="label">Shift Start</span>
@@ -519,21 +510,26 @@
                 placeholder="Google destination search loads after API setup…" disabled />
             </div>
             <div id="routeHelp" class="map-message">
-              Set your Google Maps API key and default starting address in the CONFIG section near the bottom of this file.
+              Loading destination search…
             </div>
-          </div>
-
-          <div class="config-note">
-            <strong>One-time setup:</strong> edit <code>GOOGLE_MAPS_API_KEY</code> and
-            <code>DEFAULT_STARTING_LOCATION</code> in this file. The supervisor can still change the starting location on the page.
           </div>
         </section>
 
         <section class="card input-card">
           <h2>2. Field Time</h2>
-          <div class="sub">Only enter the things Google cannot know. Travel-to-site and return travel populate from the route.</div>
+          <div class="sub">Travel-to-site and return travel populate from the route. Adjust the other field times as needed.</div>
 
           <div class="time-grid">
+            <div class="time-control">
+              <span class="label">Briefing</span>
+              <div class="stepper">
+                <button type="button" data-step="briefing" data-delta="-5" aria-label="Decrease briefing time">−</button>
+                <input id="briefing" type="number" min="0" max="180" step="1" value="15" />
+                <button type="button" data-step="briefing" data-delta="5" aria-label="Increase briefing time">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+
             <div class="time-control">
               <span class="label">Travel to Site</span>
               <div class="stepper">
@@ -567,23 +563,23 @@
             <div class="time-control">
               <span class="label">Lunch / Break</span>
               <div class="stepper">
-                <button type="button" data-step="lunch" data-delta="-5" aria-label="Decrease lunch">−</button>
+                <button type="button" data-step="lunch" data-delta="-5" aria-label="Decrease lunch time">−</button>
                 <input id="lunch" type="number" min="0" max="180" step="1" value="30" />
-                <button type="button" data-step="lunch" data-delta="5" aria-label="Increase lunch">+</button>
+                <button type="button" data-step="lunch" data-delta="5" aria-label="Increase lunch time">+</button>
               </div>
               <span class="unit">minutes</span>
             </div>
-			
+
             <div class="time-control">
               <span class="label">Transport Machine</span>
               <div class="stepper">
-                <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine movement">−</button>
-                <input id="moveMachine" type="number" min="0" max="600" step="1" value="00" />
-                <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine movement">+</button>
+                <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine transport time">−</button>
+                <input id="moveMachine" type="number" min="0" max="600" step="1" value="0" />
+                <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine transport time">+</button>
               </div>
               <span class="unit">minutes</span>
             </div>
-			
+
             <div class="time-control">
               <span class="label">Return Travel</span>
               <div class="stepper">
@@ -592,6 +588,16 @@
                 <button type="button" data-step="returnTravel" data-delta="5" aria-label="Increase return travel">+</button>
               </div>
               <span class="unit">minutes · defaults to route time, editable</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Debriefing</span>
+              <div class="stepper">
+                <button type="button" data-step="debriefing" data-delta="-5" aria-label="Decrease debriefing time">−</button>
+                <input id="debriefing" type="number" min="0" max="180" step="1" value="15" />
+                <button type="button" data-step="debriefing" data-delta="5" aria-label="Increase debriefing time">+</button>
+              </div>
+              <span class="unit">minutes</span>
             </div>
           </div>
 
@@ -690,12 +696,14 @@
       crew: $("crew"),
       startTime: $("startTime"),
       endTime: $("endTime"),
+      briefing: $("briefing"),
       travelSite: $("travelSite"),
       service: $("service"),
       travelMachine: $("travelMachine"),
       moveMachine: $("moveMachine"),
       lunch: $("lunch"),
       returnTravel: $("returnTravel"),
+      debriefing: $("debriefing"),
       notes: $("notes"),
       startingLocation: $("startingLocation")
     };
@@ -799,14 +807,16 @@
       if (end <= start) end += 1440;
 
       const shift = Math.max(0, end - start);
+      const briefing = readMinutes("briefing", 180);
       const travelSite = readMinutes("travelSite");
       const service = readMinutes("service");
       const travelMachine = readMinutes("travelMachine");
       const moveMachine = readMinutes("moveMachine");
       const lunch = readMinutes("lunch", 180);
       const returnTravel = readMinutes("returnTravel");
+      const debriefing = readMinutes("debriefing", 180);
 
-      const fixed = travelSite + service + travelMachine + moveMachine + lunch + returnTravel;
+      const fixed = briefing + travelSite + service + travelMachine + moveMachine + lunch + returnTravel + debriefing;
       const working = Math.max(0, shift - fixed);
 
       const rows = [];
@@ -819,13 +829,15 @@
         cursor = e;
       }
 
+      add("Briefing", briefing);
       add("Travel to Site", travelSite);
       add("Service Machine", service);
       add("Travel to Machine", travelMachine);
       add("Working", working, "working-row");
       add("Lunch / Break", lunch);
-      add("Move Machine", moveMachine);
+      add("Transport Machine", moveMachine);
       add("Return Travel", returnTravel);
+      add("Debriefing", debriefing);
 
       $("scheduleBody").innerHTML = rows.map(row => `
         <tr class="${row.className}">
@@ -850,7 +862,7 @@
 
       if (fixed > shift) {
         warning.textContent =
-          `Plan exceeds the shift by ${formatDuration(fixed - shift)}. Reduce travel, service, movement, or break time.`;
+          `Plan exceeds the shift by ${formatDuration(fixed - shift)}. Reduce travel, service, transport, briefing/debriefing, or break time.`;
         warning.classList.add("show");
         $("status").textContent = "Overbooked";
       } else if (working < 60) {
@@ -1087,7 +1099,7 @@
       button.addEventListener("click", () => {
         const id = button.dataset.step;
         const delta = parseInt(button.dataset.delta, 10) || 0;
-        const max = id === "lunch" ? 180 : 600;
+        const max = ["lunch", "briefing", "debriefing"].includes(id) ? 180 : 600;
         controls[id].value = clamp((parseInt(controls[id].value, 10) || 0) + delta, 0, max);
         recalc();
       });
@@ -1116,12 +1128,14 @@
     $("resetBtn").addEventListener("click", () => {
       controls.startTime.value = "07:00";
       controls.endTime.value = "17:30";
+      controls.briefing.value = "15";
       controls.travelSite.value = "0";
       controls.service.value = "30";
       controls.travelMachine.value = "20";
-      controls.moveMachine.value = "60";
+      controls.moveMachine.value = "0";
       controls.lunch.value = "30";
       controls.returnTravel.value = "0";
+      controls.debriefing.value = "15";
       controls.notes.value = "";
       controls.startingLocation.value = configuredDefaultStart();
       selectedDestination = null;
