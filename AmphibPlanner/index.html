@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#163d36" />
+  <title>Amphibious Excavator Daily Planner</title>
+  <style>
+    :root {
+      --bg: #eef2ef;
+      --card: #ffffff;
+      --ink: #17211e;
+      --muted: #64716d;
+      --line: #d8e0dc;
+      --accent: #163d36;
+      --accent-soft: #dfece7;
+      --good: #17633f;
+      --warn: #955c00;
+      --bad: #a52b2b;
+      --shadow: 0 8px 30px rgba(14,34,28,.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      gap: 18px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .77rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 4px 0 0;
+      font-size: clamp(1.55rem, 3vw, 2.4rem);
+      line-height: 1.05;
+    }
+
+    .status {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(340px, .98fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stack { display: grid; gap: 18px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 14px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      min-width: 0;
+    }
+
+    .label {
+      display: block;
+      font-weight: 750;
+      font-size: .9rem;
+      margin: 0 0 6px;
+    }
+
+    input[type="text"],
+    input[type="time"],
+    input[type="date"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus, textarea:focus, button:focus-visible, gmp-place-autocomplete:focus-within {
+      box-shadow: 0 0 0 3px rgba(22,61,54,.18);
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 92px;
+    }
+
+    .destination-wrap {
+      margin-top: 12px;
+    }
+
+    #placeHolder {
+      min-height: 48px;
+      width: 100%;
+    }
+
+    gmp-place-autocomplete {
+      width: 100%;
+      display: block;
+      min-height: 48px;
+      --gmpx-color-surface: #fff;
+    }
+
+    .map-message {
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f6f8f7;
+      color: var(--muted);
+      font-size: .86rem;
+      margin-top: 10px;
+    }
+
+    #map {
+      height: 300px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 20% 35%, #c9d6d0 0 5px, transparent 6px),
+        radial-gradient(circle at 75% 58%, #b9c8c1 0 5px, transparent 6px),
+        linear-gradient(135deg, #edf2ef, #dfe8e3);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+    }
+
+    .time-control {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fafcfb;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: 46px 1fr 46px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .stepper button {
+      min-height: 46px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .stepper input {
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .unit {
+      display: block;
+      text-align: center;
+      font-size: .76rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .big-number {
+      font-size: clamp(2rem,5vw,3.4rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-top: 6px;
+    }
+
+    .summary-side {
+      text-align: right;
+    }
+
+    .summary-side strong {
+      display: block;
+      font-size: 1.15rem;
+      margin-top: 3px;
+    }
+
+    .progress {
+      height: 11px;
+      border-radius: 999px;
+      background: #edf1ef;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width .18s ease;
+    }
+
+    .summary-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .87rem;
+    }
+
+    .route-stat {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #fafcfb;
+      font-size: .9rem;
+    }
+
+    .pill strong { margin-left: 4px; }
+
+    .schedule-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 11px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    th:last-child, td:last-child { text-align: right; }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .activity {
+      font-weight: 800;
+    }
+
+    .working-row {
+      background: #f4f8f6;
+    }
+
+    .warning {
+      display: none;
+      border: 1px solid #e9cf9d;
+      color: #684500;
+      background: #fff7e8;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-weight: 650;
+    }
+
+    .warning.show { display: block; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button.primary,
+    button.secondary {
+      min-height: 46px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .config-note {
+      border-left: 4px solid var(--accent);
+      padding: 10px 12px;
+      background: #f6faf8;
+      margin-top: 12px;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .print-only { display: none; }
+
+    .route-error {
+      color: var(--bad);
+      font-weight: 700;
+    }
+
+    @media (max-width: 860px) {
+      .app { padding: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .header { align-items: flex-start; }
+      .fields, .time-grid { grid-template-columns: 1fr; }
+      #map { height: 260px; }
+      .summary { grid-template-columns: 1fr; }
+      .summary-side { text-align: left; }
+    }
+
+    @media print {
+      @page { size: landscape; margin: .35in; }
+
+      body { background: white; }
+      .app { max-width: none; padding: 0; }
+      .no-print,
+      .map-card,
+      .config-note,
+      .status,
+      .stepper button,
+      #warning { display: none !important; }
+
+      .print-only { display: block; }
+
+      .grid {
+        display: block;
+      }
+
+      .stack {
+        display: block;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+        margin: 0 0 12px;
+      }
+
+      .form-card,
+      .input-card { display: none; }
+
+      .summary-card {
+        border-top: 2px solid #000;
+        border-bottom: 1px solid #999;
+        padding: 10px 0;
+        margin-bottom: 8px;
+      }
+
+      .big-number { font-size: 2rem; }
+      .progress { display: none; }
+      .schedule-card { margin-top: 4px; }
+
+      table { min-width: 0; font-size: 10pt; }
+      th, td { padding: 6px 5px; }
+
+      .print-header {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+      }
+
+      .print-notes {
+        display: block !important;
+        border: 1px solid #999;
+        min-height: 68px;
+        padding: 8px;
+        margin-top: 10px;
+        white-space: pre-wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <div class="eyebrow">Daily Work Plan</div>
+        <h1>Amphibious Excavator Crew</h1>
+      </div>
+      <div id="status" class="status">Setup Required</div>
+    </header>
+
+    <section class="print-only print-header">
+      <div><strong>Date:</strong> <span id="printDate">—</span></div>
+      <div><strong>Crew:</strong> <span id="printCrew">—</span></div>
+      <div><strong>Destination:</strong> <span id="printDestination">—</span></div>
+    </section>
+
+    <div class="grid">
+      <div class="stack">
+        <section class="card form-card">
+          <h2>1. Job Information</h2>
+          <div class="sub">Select the job site and the planner will calculate highway travel automatically.</div>
+
+          <div class="fields">
+            <label>
+              <span class="label">Date</span>
+              <input id="date" type="date" />
+            </label>
+            <label>
+              <span class="label">Crew / Supervisor</span>
+              <input id="crew" type="text" placeholder="Crew A / Smith" />
+            </label>
+            <label>
+              <span class="label">Shift Start</span>
+              <input id="startTime" type="time" value="06:30" />
+            </label>
+            <label>
+              <span class="label">Shift End</span>
+              <input id="endTime" type="time" value="16:30" />
+            </label>
+          </div>
+
+          <div class="destination-wrap">
+            <span class="label">Destination / Job Site</span>
+            <div id="placeHolder">
+              <input id="destinationFallback" type="text"
+                placeholder="Google destination search loads after API setup…" disabled />
+            </div>
+            <div id="routeHelp" class="map-message">
+              Set your Google Maps API key and starting address in the CONFIG section near the bottom of this file.
+            </div>
+          </div>
+
+          <div class="config-note">
+            <strong>One-time setup:</strong> edit <code>GOOGLE_MAPS_API_KEY</code> and
+            <code>STARTING_LOCATION</code> in this file. Restrict the key to your GitHub Pages domain.
+          </div>
+        </section>
+
+        <section class="card input-card">
+          <h2>2. Field Time</h2>
+          <div class="sub">Only enter the things Google cannot know. Travel-to-site and return travel populate from the route.</div>
+
+          <div class="time-grid">
+            <div class="time-control">
+              <span class="label">Travel to Site</span>
+              <div class="stepper">
+                <button type="button" data-step="travelSite" data-delta="-5" aria-label="Decrease travel to site">−</button>
+                <input id="travelSite" type="number" min="0" max="600" step="1" value="0" />
+                <button type="button" data-step="travelSite" data-delta="5" aria-label="Increase travel to site">+</button>
+              </div>
+              <span class="unit">minutes · auto from route, editable</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Service Machine</span>
+              <div class="stepper">
+                <button type="button" data-step="service" data-delta="-5" aria-label="Decrease service time">−</button>
+                <input id="service" type="number" min="0" max="600" step="1" value="30" />
+                <button type="button" data-step="service" data-delta="5" aria-label="Increase service time">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Travel to Machine on River</span>
+              <div class="stepper">
+                <button type="button" data-step="travelMachine" data-delta="-5" aria-label="Decrease travel to machine">−</button>
+                <input id="travelMachine" type="number" min="0" max="600" step="1" value="20" />
+                <button type="button" data-step="travelMachine" data-delta="5" aria-label="Increase travel to machine">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Move Machine</span>
+              <div class="stepper">
+                <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine movement">−</button>
+                <input id="moveMachine" type="number" min="0" max="600" step="1" value="60" />
+                <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine movement">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Lunch / Break</span>
+              <div class="stepper">
+                <button type="button" data-step="lunch" data-delta="-5" aria-label="Decrease lunch">−</button>
+                <input id="lunch" type="number" min="0" max="180" step="1" value="30" />
+                <button type="button" data-step="lunch" data-delta="5" aria-label="Increase lunch">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+
+            <div class="time-control">
+              <span class="label">Return Travel</span>
+              <div class="stepper">
+                <button type="button" data-step="returnTravel" data-delta="-5" aria-label="Decrease return travel">−</button>
+                <input id="returnTravel" type="number" min="0" max="600" step="1" value="0" />
+                <button type="button" data-step="returnTravel" data-delta="5" aria-label="Increase return travel">+</button>
+              </div>
+              <span class="unit">minutes · defaults to route time, editable</span>
+            </div>
+          </div>
+
+          <label style="margin-top:14px">
+            <span class="label">Planned Work / Notes</span>
+            <textarea id="notes" placeholder="Clean channel, remove debris, reshape bank, relocate machine downstream…"></textarea>
+          </label>
+
+          <div class="actions no-print">
+            <button id="resetBtn" class="secondary" type="button">Reset Day</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card map-card">
+          <h2>Route</h2>
+          <div class="sub" id="routeLabel">Select a destination to calculate travel.</div>
+          <div id="map">Google Map will appear here after API setup.</div>
+          <div class="route-stat">
+            <div class="pill">Drive time <strong id="driveTime">—</strong></div>
+            <div class="pill">Distance <strong id="distance">—</strong></div>
+          </div>
+        </section>
+
+        <section class="card summary-card">
+          <div class="summary">
+            <div>
+              <div class="eyebrow">Available Productive Time</div>
+              <div id="workingBig" class="big-number">—</div>
+            </div>
+            <div class="summary-side">
+              <span class="eyebrow">Shift Length</span>
+              <strong id="shiftTotal">—</strong>
+            </div>
+          </div>
+          <div class="progress"><div id="workingBar"></div></div>
+          <div id="utilization" class="summary-note">Complete the plan to calculate utilization.</div>
+          <div id="warning" class="warning" role="alert"></div>
+        </section>
+
+        <section class="card schedule-card">
+          <h2>Crew Schedule</h2>
+          <div class="sub">Automatically recalculates whenever a time changes.</div>
+          <div class="schedule-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Activity</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+
+          <div class="actions no-print">
+            <button id="printBtn" class="primary" type="button">Print Daily Plan</button>
+          </div>
+
+          <div id="printNotes" class="print-only print-notes"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /*
+      ============================================================
+      CONFIG — EDIT THESE TWO VALUES BEFORE PUBLISHING
+      ============================================================
+    */
+    const CONFIG = {
+      GOOGLE_MAPS_API_KEY: AIzaSyBveh72-EjsDWprU7S7ltwg3rGSo0baZdM,
+
+      // Use a street address Google can route from.
+      // Example: "123 Main St, Trenton, TN 38382"
+      STARTING_LOCATION: "YOUR SHOP OR OFFICE ADDRESS",
+
+      // Optional: restrict autocomplete suggestions to the U.S.
+      REGION_CODE: "us"
+    };
+
+    /*
+      ============================================================
+      APP
+      ============================================================
+    */
+    const $ = (id) => document.getElementById(id);
+
+    const controls = {
+      date: $("date"),
+      crew: $("crew"),
+      startTime: $("startTime"),
+      endTime: $("endTime"),
+      travelSite: $("travelSite"),
+      service: $("service"),
+      travelMachine: $("travelMachine"),
+      moveMachine: $("moveMachine"),
+      lunch: $("lunch"),
+      returnTravel: $("returnTravel"),
+      notes: $("notes")
+    };
+
+    let map = null;
+    let RouteClass = null;
+    let currentPolylines = [];
+    let currentMarkers = [];
+    let selectedDestination = null;
+    let destinationText = "";
+    let routeWasAutoFilled = false;
+
+    function initDate() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      controls.date.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function clamp(value, min, max) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return min;
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function readMinutes(id, max = 600) {
+      const input = controls[id];
+      const value = clamp(parseInt(input.value, 10) || 0, 0, max);
+      input.value = value;
+      return value;
+    }
+
+    function timeToMinutes(value) {
+      if (!/^\d{2}:\d{2}$/.test(value || "")) return 0;
+      const [h, m] = value.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function formatClock(minutes) {
+      minutes = ((minutes % 1440) + 1440) % 1440;
+      let h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      return `${h}:${String(m).padStart(2, "0")} ${ampm}`;
+    }
+
+    function formatDuration(minutes) {
+      minutes = Math.max(0, Math.round(minutes));
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      if (h && m) return `${h} hr ${m} min`;
+      if (h) return `${h} hr${h === 1 ? "" : "s"}`;
+      return `${m} min`;
+    }
+
+    function formatDistance(meters) {
+      if (!Number.isFinite(meters)) return "—";
+      const miles = meters / 1609.344;
+      return `${miles.toFixed(miles < 10 ? 1 : 0)} mi`;
+    }
+
+    function parseDurationSeconds(duration) {
+      // Current Routes JS commonly exposes a numeric duration in milliseconds
+      // or a duration-like value. Handle several shapes defensively.
+      if (duration == null) return null;
+
+      if (typeof duration === "number") {
+        // Heuristic: route durations larger than a day in seconds are likely ms.
+        return duration > 86400 ? duration / 1000 : duration;
+      }
+
+      if (typeof duration === "string") {
+        const match = duration.match(/^([\d.]+)s$/);
+        if (match) return Number(match[1]);
+        const numeric = Number(duration);
+        return Number.isFinite(numeric) ? numeric : null;
+      }
+
+      if (typeof duration === "object") {
+        if (Number.isFinite(duration.seconds)) {
+          return Number(duration.seconds) + (Number(duration.nanos) || 0) / 1e9;
+        }
+      }
+      return null;
+    }
+
+    function updatePrintFields() {
+      $("printDate").textContent = controls.date.value || "—";
+      $("printCrew").textContent = controls.crew.value.trim() || "—";
+      $("printDestination").textContent = destinationText || "—";
+      $("printNotes").textContent = controls.notes.value.trim()
+        ? `Planned Work / Notes:\n${controls.notes.value.trim()}`
+        : "Planned Work / Notes:";
+    }
+
+    function recalc() {
+      let start = timeToMinutes(controls.startTime.value);
+      let end = timeToMinutes(controls.endTime.value);
+      if (end <= start) end += 1440;
+
+      const shift = Math.max(0, end - start);
+      const travelSite = readMinutes("travelSite");
+      const service = readMinutes("service");
+      const travelMachine = readMinutes("travelMachine");
+      const moveMachine = readMinutes("moveMachine");
+      const lunch = readMinutes("lunch", 180);
+      const returnTravel = readMinutes("returnTravel");
+
+      const fixed = travelSite + service + travelMachine + moveMachine + lunch + returnTravel;
+      const working = Math.max(0, shift - fixed);
+
+      const rows = [];
+      let cursor = start;
+
+      function add(label, duration, className = "") {
+        const s = cursor;
+        const e = cursor + duration;
+        rows.push({ label, s, e, duration, className });
+        cursor = e;
+      }
+
+      add("Travel to Site", travelSite);
+      add("Service Machine", service);
+      add("Travel to Machine", travelMachine);
+      add("Working", working, "working-row");
+      add("Lunch / Break", lunch);
+      add("Move Machine", moveMachine);
+      add("Return Travel", returnTravel);
+
+      $("scheduleBody").innerHTML = rows.map(row => `
+        <tr class="${row.className}">
+          <td class="activity">${row.label}</td>
+          <td>${formatClock(row.s)}</td>
+          <td>${formatClock(row.e)}</td>
+          <td>${formatDuration(row.duration)}</td>
+        </tr>
+      `).join("");
+
+      $("workingBig").textContent = formatDuration(working);
+      $("shiftTotal").textContent = formatDuration(shift);
+
+      const pct = shift ? Math.round((working / shift) * 100) : 0;
+      $("workingBar").style.width = `${clamp(pct, 0, 100)}%`;
+      $("utilization").textContent =
+        `${pct}% of the shift is planned as productive operating time.`;
+
+      const warning = $("warning");
+      warning.classList.remove("show");
+      warning.textContent = "";
+
+      if (fixed > shift) {
+        warning.textContent =
+          `Plan exceeds the shift by ${formatDuration(fixed - shift)}. Reduce travel, service, movement, or break time.`;
+        warning.classList.add("show");
+        $("status").textContent = "Overbooked";
+      } else if (working < 60) {
+        warning.textContent =
+          `Only ${formatDuration(working)} of productive working time remains.`;
+        warning.classList.add("show");
+        $("status").textContent = "Check Plan";
+      } else if (selectedDestination) {
+        $("status").textContent = "Plan Ready";
+      } else if (mapsConfigured()) {
+        $("status").textContent = "Select Site";
+      }
+
+      updatePrintFields();
+    }
+
+    function mapsConfigured() {
+      return CONFIG.GOOGLE_MAPS_API_KEY &&
+        !CONFIG.GOOGLE_MAPS_API_KEY.includes("PASTE_YOUR") &&
+        CONFIG.STARTING_LOCATION &&
+        !CONFIG.STARTING_LOCATION.includes("YOUR SHOP");
+    }
+
+    function clearRouteGraphics() {
+      currentPolylines.forEach(polyline => polyline.setMap(null));
+      currentPolylines = [];
+
+      currentMarkers.forEach(marker => {
+        try { marker.map = null; } catch (e) {}
+      });
+      currentMarkers = [];
+    }
+
+    async function calculateRoute() {
+      if (!selectedDestination || !RouteClass) return;
+
+      $("status").textContent = "Routing…";
+      $("routeHelp").textContent = "Calculating route from the configured starting location…";
+
+      try {
+        const request = {
+          origin: CONFIG.STARTING_LOCATION,
+          destination: selectedDestination.location,
+          travelMode: "DRIVING",
+          routingPreference: "TRAFFIC_AWARE",
+          fields: ["durationMillis", "distanceMeters", "path", "viewport"]
+        };
+
+        let result;
+        try {
+          result = await RouteClass.computeRoutes(request);
+        } catch (fieldError) {
+          // Compatibility fallback if durationMillis is not available in a given release.
+          result = await RouteClass.computeRoutes({
+            origin: CONFIG.STARTING_LOCATION,
+            destination: selectedDestination.location,
+            travelMode: "DRIVING",
+            routingPreference: "TRAFFIC_AWARE",
+            fields: ["duration", "distanceMeters", "path", "viewport"]
+          });
+        }
+
+        const route = result.routes?.[0];
+        if (!route) throw new Error("No driving route was returned.");
+
+        let seconds = null;
+        if (Number.isFinite(route.durationMillis)) seconds = route.durationMillis / 1000;
+        if (seconds == null) seconds = parseDurationSeconds(route.duration);
+
+        if (seconds == null) {
+          throw new Error("The route loaded, but Google did not return a readable duration.");
+        }
+
+        const driveMinutes = Math.max(1, Math.ceil(seconds / 60));
+        controls.travelSite.value = driveMinutes;
+        controls.returnTravel.value = driveMinutes;
+        routeWasAutoFilled = true;
+
+        $("driveTime").textContent = formatDuration(driveMinutes);
+        $("distance").textContent = formatDistance(route.distanceMeters);
+        $("routeLabel").textContent = `${CONFIG.STARTING_LOCATION} → ${destinationText}`;
+        $("routeHelp").textContent =
+          "Travel-to-site and return travel were populated from Google. You can still override either value.";
+
+        clearRouteGraphics();
+
+        if (route.createPolylines) {
+          currentPolylines = route.createPolylines();
+          currentPolylines.forEach(polyline => polyline.setMap(map));
+        }
+
+        if (route.createWaypointAdvancedMarkers) {
+          try {
+            currentMarkers = await route.createWaypointAdvancedMarkers({ map });
+          } catch (e) {
+            // Route remains usable even if markers are unavailable.
+          }
+        }
+
+        if (route.viewport && map) {
+          map.fitBounds(route.viewport, 55);
+        }
+
+        $("status").textContent = "Plan Ready";
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("status").textContent = "Route Error";
+        $("routeHelp").innerHTML =
+          `<span class="route-error">Could not calculate route.</span> ${escapeHtml(error.message || "Check the address, API setup, and enabled APIs.")}`;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function initGoogleMaps() {
+      try {
+        const { Map } = await google.maps.importLibrary("maps");
+        const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+        const { Route } = await google.maps.importLibrary("routes");
+        RouteClass = Route;
+
+        map = new Map($("map"), {
+          center: { lat: 36.0, lng: -89.2 },
+          zoom: 8,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          mapId: "DEMO_MAP_ID"
+        });
+
+        const holder = $("placeHolder");
+        holder.innerHTML = "";
+
+        const autocomplete = new PlaceAutocompleteElement({
+          placeholder: "Search bridge, road, address, or landmark…",
+          includedRegionCodes: CONFIG.REGION_CODE ? [CONFIG.REGION_CODE] : undefined
+        });
+
+        holder.appendChild(autocomplete);
+
+        autocomplete.addEventListener("gmp-select", async (event) => {
+          try {
+            const place = event.placePrediction.toPlace();
+            await place.fetchFields({
+              fields: ["displayName", "formattedAddress", "location"]
+            });
+
+            if (!place.location) throw new Error("Selected place has no routable location.");
+
+            selectedDestination = place;
+            destinationText =
+              place.formattedAddress ||
+              place.displayName ||
+              event.placePrediction.text?.toString() ||
+              "Selected job site";
+
+            $("routeLabel").textContent = destinationText;
+            updatePrintFields();
+
+            map.setCenter(place.location);
+            map.setZoom(14);
+
+            await calculateRoute();
+          } catch (error) {
+            console.error(error);
+            $("status").textContent = "Site Error";
+            $("routeHelp").innerHTML =
+              `<span class="route-error">Could not use that location.</span> ${escapeHtml(error.message || "")}`;
+          }
+        });
+
+        $("routeHelp").textContent =
+          `Start point: ${CONFIG.STARTING_LOCATION}. Search for the job site above.`;
+        $("status").textContent = "Select Site";
+      } catch (error) {
+        console.error(error);
+        $("status").textContent = "Maps Error";
+        $("routeHelp").innerHTML =
+          `<span class="route-error">Google Maps failed to load.</span> Check the browser console, API key restrictions, and enabled APIs.`;
+      }
+    }
+
+    function loadGoogleMaps() {
+      if (!mapsConfigured()) {
+        $("status").textContent = "Setup Required";
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src =
+        `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(CONFIG.GOOGLE_MAPS_API_KEY)}&v=weekly&loading=async`;
+      script.async = true;
+      script.onerror = () => {
+        $("status").textContent = "Maps Error";
+        $("routeHelp").innerHTML =
+          '<span class="route-error">Google Maps script could not load.</span> Check the API key and internet connection.';
+      };
+      document.head.appendChild(script);
+
+      const waitForGoogle = setInterval(() => {
+        if (window.google?.maps?.importLibrary) {
+          clearInterval(waitForGoogle);
+          initGoogleMaps();
+        }
+      }, 100);
+
+      setTimeout(() => clearInterval(waitForGoogle), 15000);
+    }
+
+    document.querySelectorAll("[data-step]").forEach(button => {
+      button.addEventListener("click", () => {
+        const id = button.dataset.step;
+        const delta = parseInt(button.dataset.delta, 10) || 0;
+        const max = id === "lunch" ? 180 : 600;
+        controls[id].value = clamp((parseInt(controls[id].value, 10) || 0) + delta, 0, max);
+        recalc();
+      });
+    });
+
+    Object.values(controls).forEach(control => {
+      control.addEventListener("input", recalc);
+    });
+
+    $("resetBtn").addEventListener("click", () => {
+      controls.startTime.value = "06:30";
+      controls.endTime.value = "16:30";
+      controls.travelSite.value = "0";
+      controls.service.value = "30";
+      controls.travelMachine.value = "20";
+      controls.moveMachine.value = "60";
+      controls.lunch.value = "30";
+      controls.returnTravel.value = "0";
+      controls.notes.value = "";
+      selectedDestination = null;
+      destinationText = "";
+      routeWasAutoFilled = false;
+      $("driveTime").textContent = "—";
+      $("distance").textContent = "—";
+      $("routeLabel").textContent = "Select a destination to calculate travel.";
+      clearRouteGraphics();
+      if (map) {
+        map.setCenter({ lat: 36.0, lng: -89.2 });
+        map.setZoom(8);
+      }
+      recalc();
+    });
+
+    $("printBtn").addEventListener("click", () => {
+      updatePrintFields();
+      window.print();
+    });
+
+    initDate();
+    recalc();
+    loadGoogleMaps();
+  </script>
+</body>
+</html>
