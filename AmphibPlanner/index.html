@@ -565,16 +565,6 @@
             </div>
 
             <div class="time-control">
-              <span class="label">Move Machine</span>
-              <div class="stepper">
-                <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine movement">−</button>
-                <input id="moveMachine" type="number" min="0" max="600" step="1" value="60" />
-                <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine movement">+</button>
-              </div>
-              <span class="unit">minutes</span>
-            </div>
-
-            <div class="time-control">
               <span class="label">Lunch / Break</span>
               <div class="stepper">
                 <button type="button" data-step="lunch" data-delta="-5" aria-label="Decrease lunch">−</button>
@@ -583,7 +573,17 @@
               </div>
               <span class="unit">minutes</span>
             </div>
-
+			
+            <div class="time-control">
+              <span class="label">Transport Machine</span>
+              <div class="stepper">
+                <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine movement">−</button>
+                <input id="moveMachine" type="number" min="0" max="600" step="1" value="00" />
+                <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine movement">+</button>
+              </div>
+              <span class="unit">minutes</span>
+            </div>
+			
             <div class="time-control">
               <span class="label">Return Travel</span>
               <div class="stepper">
