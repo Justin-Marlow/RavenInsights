@@ -864,6 +864,7 @@
     let selectedDestination = null;
     let destinationText = "";
     let routeWasAutoFilled = false;
+    let morningDriveMinutes = 0;
 
     function initDate() {
       const now = new Date();
@@ -1102,15 +1103,24 @@
         }
 
         const driveMinutes = Math.max(1, Math.ceil(seconds / 60));
+        morningDriveMinutes = driveMinutes;
         controls.travelSite.value = driveMinutes;
-        controls.returnTravel.value = driveMinutes;
+
+        // On a normal day, the crew returns from the morning job site.
+        // On a transport day, Return Travel is calculated later from the
+        // machine transport END location back to the default starting point.
+        if (!transportEnabled()) {
+          controls.returnTravel.value = driveMinutes;
+        }
+
         routeWasAutoFilled = true;
 
         $("driveTime").textContent = formatDuration(driveMinutes);
         $("distance").textContent = formatDistance(route.distanceMeters);
         $("routeLabel").textContent = `${origin} → ${destinationText}`;
-        $("routeHelp").textContent =
-          "Travel-to-site and return travel were populated from Google. You can still override either value or click a different point on the map.";
+        $("routeHelp").textContent = transportEnabled()
+          ? "Travel-to-site was populated from Google. Return travel will be calculated from the machine transport END location back to the default starting point."
+          : "Travel-to-site and return travel were populated from Google. You can still override either value or click a different point on the map.";
 
         clearRouteGraphics();
 
@@ -1304,6 +1314,67 @@
       await calculateTransportRoute();
     }
 
+    async function calculateReturnTravelFromTransportEnd() {
+      if (!transportEnabled() || !transportToPlace || !RouteClass) {
+        return null;
+      }
+
+      // Per the planner workflow, a transport day ends by returning from the
+      // machine transport destination to the NORMAL/default starting point.
+      // If no default was configured, fall back to the visible start field.
+      const returnDestination = configuredDefaultStart() || currentStartingLocation();
+
+      if (!returnDestination) {
+        throw new Error("No default starting location is configured for return travel.");
+      }
+
+      const request = {
+        origin: transportToPlace.location,
+        destination: returnDestination,
+        travelMode: "DRIVING",
+        routingPreference: "TRAFFIC_AWARE",
+        fields: ["durationMillis", "distanceMeters"]
+      };
+
+      let result;
+      try {
+        result = await RouteClass.computeRoutes(request);
+      } catch (fieldError) {
+        result = await RouteClass.computeRoutes({
+          origin: transportToPlace.location,
+          destination: returnDestination,
+          travelMode: "DRIVING",
+          routingPreference: "TRAFFIC_AWARE",
+          fields: ["duration", "distanceMeters"]
+        });
+      }
+
+      const route = result.routes?.[0];
+      if (!route) {
+        throw new Error("No return route was returned from the transport destination.");
+      }
+
+      let seconds = null;
+      if (Number.isFinite(route.durationMillis)) {
+        seconds = route.durationMillis / 1000;
+      }
+      if (seconds == null) {
+        seconds = parseDurationSeconds(route.duration);
+      }
+      if (seconds == null) {
+        throw new Error("The return route loaded, but its duration could not be read.");
+      }
+
+      const returnMinutes = Math.max(1, Math.ceil(seconds / 60));
+      controls.returnTravel.value = returnMinutes;
+
+      return {
+        minutes: returnMinutes,
+        distanceMeters: route.distanceMeters,
+        destination: returnDestination
+      };
+    }
+
     async function calculateTransportRoute() {
       if (!transportEnabled() || !transportFromPlace || !transportToPlace || !RouteClass) {
         return;
@@ -1357,8 +1428,15 @@
           transportMap.fitBounds(route.viewport, 50);
         }
 
-        $("transportHelp").textContent =
-          "Transport time was populated from Google. You can still override the minutes if loading/unloading or field conditions add time.";
+        const returnRoute = await calculateReturnTravelFromTransportEnd();
+
+        if (returnRoute) {
+          $("transportHelp").textContent =
+            `Transport time was populated from Google. Return Travel was also calculated from the transport END location back to ${returnRoute.destination}. Both times remain editable.`;
+        } else {
+          $("transportHelp").textContent =
+            "Transport time was populated from Google. You can still override the minutes if loading/unloading or field conditions add time.";
+        }
 
         recalc();
       } catch (error) {
@@ -1564,7 +1642,14 @@
         controls.moveMachine.value = "0";
         $("transportDriveTime").textContent = "—";
         $("transportDistance").textContent = "—";
+
+        // Return to the normal non-transport behavior.
+        controls.returnTravel.value = morningDriveMinutes || 0;
       } else {
+        // On a transport day the return trip is NOT based on the morning
+        // job-site route. It will be calculated from Transport To -> default start.
+        controls.returnTravel.value = "0";
+
         // Google maps may have initialized while the panel was hidden.
         // Trigger a resize after showing it so the transport map renders correctly.
         if (transportMap && window.google?.maps?.event) {
@@ -1630,6 +1715,7 @@
       selectedDestination = null;
       destinationText = "";
       routeWasAutoFilled = false;
+      morningDriveMinutes = 0;
       controls.selectedDestination.value = "";
       if (mapSelectionMarker) {
         mapSelectionMarker.map = null;
