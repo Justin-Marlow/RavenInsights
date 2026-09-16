@@ -37,6 +37,7 @@
       max-width: 1180px;
       margin: 0 auto;
       padding: 24px;
+      cursor: crosshair;
     }
 
     .header {
@@ -480,7 +481,7 @@
             </label>
             <label>
               <span class="label">Crew / Supervisor</span>
-              <input id="crew" type="text" placeholder="Crew A" />
+              <input id="crew" type="text" placeholder="Crew A / Smith" />
             </label>
             <label>
               <span class="label">Shift Start</span>
@@ -509,8 +510,15 @@
               <input id="destinationFallback" type="text"
                 placeholder="Google destination search loads after API setup…" disabled />
             </div>
+
+            <label style="margin-top:10px">
+              <span class="label">Selected Destination</span>
+              <input id="selectedDestination" type="text"
+                placeholder="Search above or click the map to choose a site" readonly />
+            </label>
+
             <div id="routeHelp" class="map-message">
-              Loading destination search…
+              Search for a destination above or click directly on the map to select the job site.
             </div>
           </div>
         </section>
@@ -615,8 +623,9 @@
       <div class="stack">
         <section class="card map-card">
           <h2>Route</h2>
-          <div class="sub" id="routeLabel">Select a destination to calculate travel.</div>
+          <div class="sub" id="routeLabel">Search above or click the map to select the job site.</div>
           <div id="map">Google Map will appear here after API setup.</div>
+          <div class="map-message">Tip: zoom/pan to the bridge or access point, then click the exact location you want to route to.</div>
           <div class="route-stat">
             <div class="pill">Drive time <strong id="driveTime">—</strong></div>
             <div class="pill">Distance <strong id="distance">—</strong></div>
@@ -705,11 +714,16 @@
       returnTravel: $("returnTravel"),
       debriefing: $("debriefing"),
       notes: $("notes"),
-      startingLocation: $("startingLocation")
+      startingLocation: $("startingLocation"),
+      selectedDestination: $("selectedDestination")
     };
 
     let map = null;
     let RouteClass = null;
+    let geocoder = null;
+    let AdvancedMarkerElementClass = null;
+    let destinationAutocomplete = null;
+    let mapSelectionMarker = null;
     let currentPolylines = [];
     let currentMarkers = [];
     let selectedDestination = null;
@@ -795,7 +809,8 @@
     function updatePrintFields() {
       $("printDate").textContent = controls.date.value || "—";
       $("printCrew").textContent = controls.crew.value.trim() || "—";
-      $("printDestination").textContent = destinationText || "—";
+      $("printDestination").textContent =
+        controls.selectedDestination.value.trim() || destinationText || "—";
       $("printNotes").textContent = controls.notes.value.trim()
         ? `Planned Work / Notes:\n${controls.notes.value.trim()}`
         : "Planned Work / Notes:";
@@ -958,7 +973,7 @@
         $("distance").textContent = formatDistance(route.distanceMeters);
         $("routeLabel").textContent = `${origin} → ${destinationText}`;
         $("routeHelp").textContent =
-          "Travel-to-site and return travel were populated from Google. You can still override either value.";
+          "Travel-to-site and return travel were populated from Google. You can still override either value or click a different point on the map.";
 
         clearRouteGraphics();
 
@@ -998,12 +1013,88 @@
         .replaceAll("'", "&#039;");
     }
 
+    function latLngNumbers(location) {
+      const lat = typeof location.lat === "function" ? location.lat() : Number(location.lat);
+      const lng = typeof location.lng === "function" ? location.lng() : Number(location.lng);
+      return { lat, lng };
+    }
+
+    function setDestinationDisplay(text) {
+      controls.selectedDestination.value = text || "";
+      $("printDestination").textContent = text || "—";
+
+      // PlaceAutocompleteElement does not expose a documented text-value API.
+      // Updating the placeholder still gives the crew a visible cue in the search box.
+      if (destinationAutocomplete && text) {
+        destinationAutocomplete.placeholder = text;
+      }
+    }
+
+    function showSelectionMarker(location) {
+      if (!AdvancedMarkerElementClass || !map) return;
+
+      if (!mapSelectionMarker) {
+        mapSelectionMarker = new AdvancedMarkerElementClass({
+          map,
+          position: location,
+          title: "Selected job site"
+        });
+      } else {
+        mapSelectionMarker.map = map;
+        mapSelectionMarker.position = location;
+      }
+    }
+
+    async function selectDestinationFromMap(location) {
+      if (!location) return;
+
+      $("status").textContent = "Selecting Site…";
+
+      const coords = latLngNumbers(location);
+      const coordinateText = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+
+      selectedDestination = { location };
+      destinationText = coordinateText;
+      setDestinationDisplay(destinationText);
+      showSelectionMarker(location);
+
+      if (map) {
+        map.panTo(location);
+      }
+
+      try {
+        if (geocoder) {
+          const { results } = await geocoder.geocode({ location });
+          if (results && results[0] && results[0].formatted_address) {
+            destinationText = results[0].formatted_address;
+            setDestinationDisplay(destinationText);
+          }
+        }
+      } catch (error) {
+        // A rural river point may not have a useful street address.
+        // Coordinates remain a valid routing destination.
+        console.warn("Reverse geocoding failed; using coordinates.", error);
+      }
+
+      $("routeLabel").textContent = destinationText;
+      $("routeHelp").textContent =
+        `Map point selected: ${destinationText}. Calculating route…`;
+
+      updatePrintFields();
+      await calculateRoute();
+    }
+
     async function initGoogleMaps() {
       try {
         const { Map } = await google.maps.importLibrary("maps");
         const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
         const { Route } = await google.maps.importLibrary("routes");
+        const { Geocoder } = await google.maps.importLibrary("geocoding");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
         RouteClass = Route;
+        geocoder = new Geocoder();
+        AdvancedMarkerElementClass = AdvancedMarkerElement;
 
         map = new Map($("map"), {
           center: { lat: 36.0, lng: -89.2 },
@@ -1014,6 +1105,12 @@
           mapId: "DEMO_MAP_ID"
         });
 
+        map.addListener("click", async (event) => {
+          if (event.latLng) {
+            await selectDestinationFromMap(event.latLng);
+          }
+        });
+
         const holder = $("placeHolder");
         holder.innerHTML = "";
 
@@ -1022,6 +1119,7 @@
           includedRegionCodes: CONFIG.REGION_CODE ? [CONFIG.REGION_CODE] : undefined
         });
 
+        destinationAutocomplete = autocomplete;
         holder.appendChild(autocomplete);
 
         autocomplete.addEventListener("gmp-select", async (event) => {
@@ -1041,6 +1139,8 @@
               "Selected job site";
 
             $("routeLabel").textContent = destinationText;
+            setDestinationDisplay(destinationText);
+            showSelectionMarker(place.location);
             updatePrintFields();
 
             map.setCenter(place.location);
@@ -1057,8 +1157,8 @@
 
         const startText = currentStartingLocation();
         $("routeHelp").textContent = startText
-          ? `Start point: ${startText}. Search for the job site above.`
-          : "Enter a starting location, then search for the job site above.";
+          ? `Start point: ${startText}. Search above or click the map to choose the job site.`
+          : "Enter a starting location, then search above or click the map to choose the job site.";
         $("status").textContent = "Select Site";
       } catch (error) {
         console.error(error);
@@ -1114,7 +1214,7 @@
         await calculateRoute();
       } else if (currentStartingLocation()) {
         $("routeHelp").textContent =
-          `Start point: ${currentStartingLocation()}. Search for the job site above.`;
+          `Start point: ${currentStartingLocation()}. Search above or click the map to choose the job site.`;
       }
     });
 
@@ -1141,9 +1241,16 @@
       selectedDestination = null;
       destinationText = "";
       routeWasAutoFilled = false;
+      controls.selectedDestination.value = "";
+      if (mapSelectionMarker) {
+        mapSelectionMarker.map = null;
+      }
+      if (destinationAutocomplete) {
+        destinationAutocomplete.placeholder = "Search bridge, road, address, or landmark…";
+      }
       $("driveTime").textContent = "—";
       $("distance").textContent = "—";
-      $("routeLabel").textContent = "Select a destination to calculate travel.";
+      $("routeLabel").textContent = "Search above or click the map to select the job site.";
       clearRouteGraphics();
       if (map) {
         map.setCenter({ lat: 36.0, lng: -89.2 });
