@@ -189,6 +189,82 @@
       gap: 14px;
     }
 
+    .transport-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fafcfb;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .transport-toggle input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .transport-panel[hidden] {
+      display: none !important;
+    }
+
+    .transport-panel {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #f8faf9;
+    }
+
+    .transport-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    #transportMap {
+      height: 250px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #edf2ef, #dfe8e3);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+      cursor: crosshair;
+    }
+
+    .transport-map-mode {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .transport-map-mode button {
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .transport-map-mode button.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     .time-control {
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -380,7 +456,7 @@
       .app { padding: 14px; }
       .grid { grid-template-columns: 1fr; }
       .header { align-items: flex-start; }
-      .fields, .time-grid { grid-template-columns: 1fr; }
+      .fields, .time-grid, .transport-fields { grid-template-columns: 1fr; }
       #map { height: 260px; }
       .summary { grid-template-columns: 1fr; }
       .summary-side { text-align: left; }
@@ -532,7 +608,7 @@
               <span class="label">Briefing</span>
               <div class="stepper">
                 <button type="button" data-step="briefing" data-delta="-5" aria-label="Decrease briefing time">−</button>
-                <input id="briefing" type="number" min="0" max="180" step="1" value="15" />
+                <input id="briefing" type="number" min="0" max="180" step="1" value="30" />
                 <button type="button" data-step="briefing" data-delta="5" aria-label="Increase briefing time">+</button>
               </div>
               <span class="unit">minutes</span>
@@ -578,16 +654,63 @@
               <span class="unit">minutes</span>
             </div>
 
-            <div class="time-control">
-              <span class="label">Transport Machine</span>
+          </div>
+
+          <label class="transport-toggle">
+            <input id="transportRequired" type="checkbox" />
+            <span>Machine Transport Required</span>
+          </label>
+
+          <div id="transportPanel" class="transport-panel" hidden>
+            <h3 style="margin:0 0 4px">Machine Transport</h3>
+            <div class="sub">Choose where the machine is being transported from and to. Google will calculate the truck travel time.</div>
+
+            <div class="transport-fields">
+              <div>
+                <span class="label">Transport From</span>
+                <div id="transportFromHolder">
+                  <input type="text" placeholder="Search transport start…" disabled />
+                </div>
+                <input id="transportFromDisplay" type="text" placeholder="No start selected" readonly style="margin-top:8px" />
+              </div>
+
+              <div>
+                <span class="label">Transport To</span>
+                <div id="transportToHolder">
+                  <input type="text" placeholder="Search transport destination…" disabled />
+                </div>
+                <input id="transportToDisplay" type="text" placeholder="No destination selected" readonly style="margin-top:8px" />
+              </div>
+            </div>
+
+            <div class="transport-map-mode">
+              <button id="setTransportStartBtn" type="button" class="active">Map Click Sets START</button>
+              <button id="setTransportEndBtn" type="button">Map Click Sets END</button>
+            </div>
+
+            <div id="transportMap">Transport map loads with Google Maps.</div>
+
+            <div class="route-stat">
+              <div class="pill">Transport drive time <strong id="transportDriveTime">—</strong></div>
+              <div class="pill">Distance <strong id="transportDistance">—</strong></div>
+            </div>
+
+            <div class="time-control" style="margin-top:12px">
+              <span class="label">Transport Machine Time</span>
               <div class="stepper">
                 <button type="button" data-step="moveMachine" data-delta="-15" aria-label="Decrease machine transport time">−</button>
                 <input id="moveMachine" type="number" min="0" max="600" step="1" value="0" />
                 <button type="button" data-step="moveMachine" data-delta="15" aria-label="Increase machine transport time">+</button>
               </div>
-              <span class="unit">minutes</span>
+              <span class="unit">minutes · auto from transport route, editable</span>
             </div>
 
+            <div id="transportHelp" class="map-message">
+              Search for both locations, or use the map buttons to set START and END by clicking the map.
+            </div>
+          </div>
+
+          <div class="time-grid">
             <div class="time-control">
               <span class="label">Return Travel</span>
               <div class="stepper">
@@ -602,7 +725,7 @@
               <span class="label">Debriefing</span>
               <div class="stepper">
                 <button type="button" data-step="debriefing" data-delta="-5" aria-label="Decrease debriefing time">−</button>
-                <input id="debriefing" type="number" min="0" max="180" step="1" value="15" />
+                <input id="debriefing" type="number" min="0" max="180" step="1" value="30" />
                 <button type="button" data-step="debriefing" data-delta="5" aria-label="Increase debriefing time">+</button>
               </div>
               <span class="unit">minutes</span>
@@ -710,6 +833,7 @@
       service: $("service"),
       travelMachine: $("travelMachine"),
       moveMachine: $("moveMachine"),
+      transportRequired: $("transportRequired"),
       lunch: $("lunch"),
       returnTravel: $("returnTravel"),
       debriefing: $("debriefing"),
@@ -724,6 +848,17 @@
     let AdvancedMarkerElementClass = null;
     let destinationAutocomplete = null;
     let mapSelectionMarker = null;
+
+    let transportMap = null;
+    let transportFromAutocomplete = null;
+    let transportToAutocomplete = null;
+    let transportFromPlace = null;
+    let transportToPlace = null;
+    let transportStartMarker = null;
+    let transportEndMarker = null;
+    let transportMapClickMode = "start";
+    let transportPolylines = [];
+
     let currentPolylines = [];
     let currentMarkers = [];
     let selectedDestination = null;
@@ -826,7 +961,7 @@
       const travelSite = readMinutes("travelSite");
       const service = readMinutes("service");
       const travelMachine = readMinutes("travelMachine");
-      const moveMachine = readMinutes("moveMachine");
+      const moveMachine = transportEnabled() ? readMinutes("moveMachine") : 0;
       const lunch = readMinutes("lunch", 180);
       const returnTravel = readMinutes("returnTravel");
       const debriefing = readMinutes("debriefing", 180);
@@ -850,7 +985,9 @@
       add("Travel to Machine", travelMachine);
       add("Working", working, "working-row");
       add("Lunch / Break", lunch);
-      add("Transport Machine", moveMachine);
+      if (transportEnabled()) {
+        add("Transport Machine", moveMachine);
+      }
       add("Return Travel", returnTravel);
       add("Debriefing", debriefing);
 
@@ -1084,6 +1221,153 @@
       await calculateRoute();
     }
 
+
+    function transportEnabled() {
+      return controls.transportRequired.checked;
+    }
+
+    function clearTransportRouteGraphics() {
+      transportPolylines.forEach(polyline => {
+        try { polyline.setMap(null); } catch (e) {}
+      });
+      transportPolylines = [];
+    }
+
+    function setTransportMapMode(mode) {
+      transportMapClickMode = mode;
+      $("setTransportStartBtn").classList.toggle("active", mode === "start");
+      $("setTransportEndBtn").classList.toggle("active", mode === "end");
+      $("transportHelp").textContent =
+        mode === "start"
+          ? "Map click will set the transport START location."
+          : "Map click will set the transport END location.";
+    }
+
+    function showTransportMarker(which, location) {
+      if (!AdvancedMarkerElementClass || !transportMap) return;
+
+      if (which === "start") {
+        if (!transportStartMarker) {
+          transportStartMarker = new AdvancedMarkerElementClass({
+            map: transportMap,
+            position: location,
+            title: "Transport start"
+          });
+        } else {
+          transportStartMarker.map = transportMap;
+          transportStartMarker.position = location;
+        }
+      } else {
+        if (!transportEndMarker) {
+          transportEndMarker = new AdvancedMarkerElementClass({
+            map: transportMap,
+            position: location,
+            title: "Transport destination"
+          });
+        } else {
+          transportEndMarker.map = transportMap;
+          transportEndMarker.position = location;
+        }
+      }
+    }
+
+    async function transportLocationFromMap(which, location) {
+      if (!location) return;
+
+      const coords = latLngNumbers(location);
+      let label = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+
+      try {
+        if (geocoder) {
+          const { results } = await geocoder.geocode({ location });
+          if (results?.[0]?.formatted_address) {
+            label = results[0].formatted_address;
+          }
+        }
+      } catch (error) {
+        console.warn("Transport reverse geocoding failed; using coordinates.", error);
+      }
+
+      const pseudoPlace = { location, formattedAddress: label, displayName: label };
+
+      if (which === "start") {
+        transportFromPlace = pseudoPlace;
+        $("transportFromDisplay").value = label;
+        if (transportFromAutocomplete) transportFromAutocomplete.placeholder = label;
+      } else {
+        transportToPlace = pseudoPlace;
+        $("transportToDisplay").value = label;
+        if (transportToAutocomplete) transportToAutocomplete.placeholder = label;
+      }
+
+      showTransportMarker(which, location);
+      await calculateTransportRoute();
+    }
+
+    async function calculateTransportRoute() {
+      if (!transportEnabled() || !transportFromPlace || !transportToPlace || !RouteClass) {
+        return;
+      }
+
+      $("transportHelp").textContent = "Calculating machine transport route…";
+
+      try {
+        const request = {
+          origin: transportFromPlace.location,
+          destination: transportToPlace.location,
+          travelMode: "DRIVING",
+          routingPreference: "TRAFFIC_AWARE",
+          fields: ["durationMillis", "distanceMeters", "path", "viewport"]
+        };
+
+        let result;
+        try {
+          result = await RouteClass.computeRoutes(request);
+        } catch (fieldError) {
+          result = await RouteClass.computeRoutes({
+            origin: transportFromPlace.location,
+            destination: transportToPlace.location,
+            travelMode: "DRIVING",
+            routingPreference: "TRAFFIC_AWARE",
+            fields: ["duration", "distanceMeters", "path", "viewport"]
+          });
+        }
+
+        const route = result.routes?.[0];
+        if (!route) throw new Error("No transport route was returned.");
+
+        let seconds = null;
+        if (Number.isFinite(route.durationMillis)) seconds = route.durationMillis / 1000;
+        if (seconds == null) seconds = parseDurationSeconds(route.duration);
+        if (seconds == null) throw new Error("Transport route duration could not be read.");
+
+        const minutes = Math.max(1, Math.ceil(seconds / 60));
+        controls.moveMachine.value = minutes;
+        $("transportDriveTime").textContent = formatDuration(minutes);
+        $("transportDistance").textContent = formatDistance(route.distanceMeters);
+
+        clearTransportRouteGraphics();
+
+        if (route.createPolylines) {
+          transportPolylines = route.createPolylines();
+          transportPolylines.forEach(polyline => polyline.setMap(transportMap));
+        }
+
+        if (route.viewport && transportMap) {
+          transportMap.fitBounds(route.viewport, 50);
+        }
+
+        $("transportHelp").textContent =
+          "Transport time was populated from Google. You can still override the minutes if loading/unloading or field conditions add time.";
+
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("transportHelp").innerHTML =
+          `<span class="route-error">Could not calculate transport route.</span> ${escapeHtml(error.message || "")}`;
+      }
+    }
+
     async function initGoogleMaps() {
       try {
         const { Map } = await google.maps.importLibrary("maps");
@@ -1155,6 +1439,68 @@
           }
         });
 
+
+        transportMap = new Map($("transportMap"), {
+          center: { lat: 36.0, lng: -89.2 },
+          zoom: 8,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          mapId: "DEMO_MAP_ID"
+        });
+
+        transportMap.addListener("click", async (event) => {
+          if (event.latLng && transportEnabled()) {
+            await transportLocationFromMap(transportMapClickMode, event.latLng);
+          }
+        });
+
+        const transportFromHolder = $("transportFromHolder");
+        const transportToHolder = $("transportToHolder");
+        transportFromHolder.innerHTML = "";
+        transportToHolder.innerHTML = "";
+
+        transportFromAutocomplete = new PlaceAutocompleteElement({
+          placeholder: "Search transport start…",
+          includedRegionCodes: CONFIG.REGION_CODE ? [CONFIG.REGION_CODE] : undefined
+        });
+
+        transportToAutocomplete = new PlaceAutocompleteElement({
+          placeholder: "Search transport destination…",
+          includedRegionCodes: CONFIG.REGION_CODE ? [CONFIG.REGION_CODE] : undefined
+        });
+
+        transportFromHolder.appendChild(transportFromAutocomplete);
+        transportToHolder.appendChild(transportToAutocomplete);
+
+        transportFromAutocomplete.addEventListener("gmp-select", async (event) => {
+          const place = event.placePrediction.toPlace();
+          await place.fetchFields({ fields: ["displayName", "formattedAddress", "location"] });
+          if (!place.location) return;
+
+          transportFromPlace = place;
+          const label = place.formattedAddress || place.displayName || "Selected transport start";
+          $("transportFromDisplay").value = label;
+          showTransportMarker("start", place.location);
+          transportMap.setCenter(place.location);
+          transportMap.setZoom(13);
+          await calculateTransportRoute();
+        });
+
+        transportToAutocomplete.addEventListener("gmp-select", async (event) => {
+          const place = event.placePrediction.toPlace();
+          await place.fetchFields({ fields: ["displayName", "formattedAddress", "location"] });
+          if (!place.location) return;
+
+          transportToPlace = place;
+          const label = place.formattedAddress || place.displayName || "Selected transport destination";
+          $("transportToDisplay").value = label;
+          showTransportMarker("end", place.location);
+          transportMap.setCenter(place.location);
+          transportMap.setZoom(13);
+          await calculateTransportRoute();
+        });
+
         const startText = currentStartingLocation();
         $("routeHelp").textContent = startText
           ? `Start point: ${startText}. Search above or click the map to choose the job site.`
@@ -1209,6 +1555,35 @@
       control.addEventListener("input", recalc);
     });
 
+
+    controls.transportRequired.addEventListener("change", async () => {
+      const enabled = transportEnabled();
+      $("transportPanel").hidden = !enabled;
+
+      if (!enabled) {
+        controls.moveMachine.value = "0";
+        $("transportDriveTime").textContent = "—";
+        $("transportDistance").textContent = "—";
+      } else {
+        // Google maps may have initialized while the panel was hidden.
+        // Trigger a resize after showing it so the transport map renders correctly.
+        if (transportMap && window.google?.maps?.event) {
+          setTimeout(() => {
+            google.maps.event.trigger(transportMap, "resize");
+            if (transportFromPlace?.location) {
+              transportMap.setCenter(transportFromPlace.location);
+            }
+          }, 0);
+        }
+        await calculateTransportRoute();
+      }
+
+      recalc();
+    });
+
+    $("setTransportStartBtn").addEventListener("click", () => setTransportMapMode("start"));
+    $("setTransportEndBtn").addEventListener("click", () => setTransportMapMode("end"));
+
     controls.startingLocation.addEventListener("change", async () => {
       if (selectedDestination && RouteClass && currentStartingLocation()) {
         await calculateRoute();
@@ -1228,14 +1603,28 @@
     $("resetBtn").addEventListener("click", () => {
       controls.startTime.value = "07:00";
       controls.endTime.value = "17:30";
-      controls.briefing.value = "15";
+      controls.briefing.value = "30";
       controls.travelSite.value = "0";
       controls.service.value = "30";
       controls.travelMachine.value = "20";
       controls.moveMachine.value = "0";
+      controls.transportRequired.checked = false;
+      $("transportPanel").hidden = true;
+      transportFromPlace = null;
+      transportToPlace = null;
+      $("transportFromDisplay").value = "";
+      $("transportToDisplay").value = "";
+      $("transportDriveTime").textContent = "—";
+      $("transportDistance").textContent = "—";
+      clearTransportRouteGraphics();
+      if (transportStartMarker) transportStartMarker.map = null;
+      if (transportEndMarker) transportEndMarker.map = null;
+      if (transportFromAutocomplete) transportFromAutocomplete.placeholder = "Search transport start…";
+      if (transportToAutocomplete) transportToAutocomplete.placeholder = "Search transport destination…";
+      setTransportMapMode("start");
       controls.lunch.value = "60";
       controls.returnTravel.value = "0";
-      controls.debriefing.value = "15";
+      controls.debriefing.value = "30";
       controls.notes.value = "";
       controls.startingLocation.value = configuredDefaultStart();
       selectedDestination = null;
