@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f2d2b" />
+  <title>WTRBA Stream Gages | Raven Insights</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Raven Insights</p>
+      <h1>WTRBA Stream Gages</h1>
+      <p class="subtitle">Live stream-stage and sensor-health monitoring</p>
+    </div>
+	<div class="header-actions">
+		<button
+			id="themeToggle"
+			class="button button-secondary"
+			type="button">
+			☾ Dark
+		</button>
+		<button
+			id="refreshBtn"
+			class="button button-secondary"
+			type="button">
+			Refresh
+		</button>
+		<span
+			id="lastRefresh"
+			class="last-refresh">
+			—
+		</span>
+	</div>
+  </header>
+
+  <main class="dashboard-shell">
+    <aside class="station-sidebar">
+      <div class="sidebar-heading">
+        <h2>Stations</h2>
+        <span id="stationCount" class="count-pill">0</span>
+      </div>
+      <div id="stationList" class="station-list" aria-label="Stream gage stations"></div>
+    </aside>
+
+    <section class="main-panel">
+      <div id="errorBanner" class="error-banner" hidden></div>
+
+      <section class="station-hero">
+        <div>
+          <div class="station-title-row">
+            <h2 id="stationName">Select a station</h2>
+            <span id="statusBadge" class="status-badge status-unknown">Unknown</span>
+          </div>
+          <p id="stationDescription" class="station-description"></p>
+        </div>
+        <div class="range-controls">
+			<button
+				class="range-button"
+				data-range="1d">
+				24 HR
+			</button>
+			<button
+				class="range-button active"
+				data-range="7d">
+				7 DAYS
+			</button>
+			<button
+				class="range-button"
+				data-range="30d">
+				30 DAYS
+			</button>
+			<button
+				id="printBtn"
+				class="range-button"
+				type="button">
+				Print / PDF
+			</button>
+			<button
+				id="exportCsvBtn"
+				class="range-button"
+				type="button">
+				Download CSV
+			</button>
+		</div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="metric-card metric-primary">
+          <span class="metric-label">Current Water Elevation</span>
+          <div class="metric-value-row">
+            <span id="waterValue" class="metric-value">—</span>
+            <span id="waterUnit" class="metric-unit">ft</span>
+          </div>
+          <span id="waterUpdated" class="metric-detail">No reading</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">6 Hour Change</span>
+          <div class="metric-value-row">
+            <span id="change6h" class="metric-value metric-value-small">—</span>
+            <span class="metric-unit">ft</span>
+          </div>
+          <span id="trend6h" class="metric-detail">—</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">24 Hour Change</span>
+          <div class="metric-value-row">
+            <span id="change24h" class="metric-value metric-value-small">—</span>
+            <span class="metric-unit">ft</span>
+          </div>
+          <span id="trend24h" class="metric-detail">—</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Battery</span>
+          <div class="metric-value-row">
+            <span id="batteryValue" class="metric-value metric-value-small">—</span>
+            <span class="metric-unit">%</span>
+          </div>
+          <div class="battery-track" aria-hidden="true"><div id="batteryBar" class="battery-bar"></div></div>
+          <span id="batteryUpdated" class="metric-detail">No reading</span>
+        </article>
+      </section>
+
+      <section class="chart-card">
+        <div class="chart-header">
+          <div>
+            <p class="eyebrow">Hydrograph</p>
+            <h3>Water Surface Elevation</h3>
+          </div>
+		  <div class="period-stats">
+			<div>
+				<span>Period High</span>
+				<strong>
+					<span id="periodHigh">—</span> ft
+				</strong>
+			</div>
+			<div>
+				<span>Period Low</span>
+				<strong>
+					<span id="periodLow">—</span> ft
+				</strong>
+			</div>
+</div>
+          <div class="chart-legend"><span class="legend-dot"></span> Water elevation (ft)</div>
+        </div>
+        <div id="chartWrap" class="chart-wrap">
+          <svg id="waterChart" viewBox="0 0 1000 360" role="img" aria-label="Water Surface Elevation hydrograph"></svg>
+          <div id="chartEmpty" class="chart-empty" hidden>No water-level data available for this period.</div>
+        </div>
+		<div
+			id="chartTooltip"
+			class="chart-tooltip"
+			hidden>
+		</div>
+      </section>
+
+<div class="health-grid">
+  <div>
+    <span class="health-label">
+      Last water reading
+    </span>
+    <strong id="lastWaterReading">
+      —
+    </strong>
+  </div>
+  <div>
+    <span class="health-label">
+      Last battery reading
+    </span>
+    <strong id="lastBatteryReading">
+      —
+    </strong>
+  </div>
+  <div>
+    <span class="health-label">
+      Sensor reference elevation
+    </span>
+    <strong id="referenceElevation">
+      —
+    </strong>
+  </div>
+  <div>
+    <span class="health-label">
+      Display period
+    </span>
+    <strong id="reportingRange">
+      —
+    </strong>
+  </div>
+</div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>West Tennessee River Basin Authority</span>
+    <span>Data source: TN Tech CHORDS / Grafana datasource proxy</span>
+  </footer>
+
+  <script src="stations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

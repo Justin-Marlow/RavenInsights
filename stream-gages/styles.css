@@ -1,0 +1,798 @@
+:root {
+  --bg: #f3f6f4;
+  --panel: #ffffff;
+  --panel-soft: #f8faf9;
+  --text: #17302e;
+  --muted: #6b7c79;
+  --border: #dce5e2;
+  --accent: #16736b;
+  --accent-dark: #0f4f4a;
+  --accent-soft: #dff1ee;
+  --good: #198754;
+  --warn: #b7791f;
+  --bad: #b42318;
+  --shadow: 0 8px 24px rgba(25, 55, 51, 0.08);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+button { font: inherit; }
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.4rem 2rem;
+  background: #102f2c;
+  color: white;
+  border-bottom: 4px solid #2b8c82;
+}
+.site-header h1 { margin: .1rem 0 .2rem; font-size: clamp(1.5rem, 3vw, 2.2rem); }
+.subtitle { margin: 0; color: #cfe0dd; }
+.eyebrow { margin: 0; text-transform: uppercase; font-size: .72rem; letter-spacing: .12em; font-weight: 800; color: var(--accent); }
+.site-header .eyebrow { color: #84cbc4; }
+.header-actions { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; justify-content: flex-end; }
+.last-refresh { font-size: .78rem; color: #cfe0dd; }
+
+.button, .range-button {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 9px;
+  padding: .58rem .85rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+.button-secondary { background: transparent; border-color: #5c8e89; color: white; }
+.button:hover, .range-button:hover { transform: translateY(-1px); }
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: calc(100vh - 145px);
+}
+.station-sidebar {
+  background: #eaf0ee;
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+}
+.sidebar-heading { display: flex; align-items: center; justify-content: space-between; }
+.sidebar-heading h2 { font-size: 1rem; margin: .4rem 0 1rem; }
+.count-pill { min-width: 1.7rem; height: 1.7rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); display: grid; place-items: center; font-weight: 800; font-size: .78rem; }
+.station-list { display: grid; gap: .6rem; }
+.station-button {
+  width: 100%; text-align: left; padding: .9rem; border: 1px solid transparent; border-radius: 10px;
+  background: transparent; cursor: pointer; color: var(--text);
+}
+.station-button:hover { background: rgba(255,255,255,.65); }
+.station-button.active { background: white; border-color: var(--border); box-shadow: 0 2px 8px rgba(25,55,51,.06); }
+.station-button strong { display: block; }
+.station-button span { display: block; color: var(--muted); font-size: .78rem; margin-top: .25rem; }
+
+.main-panel { padding: 1.3rem; min-width: 0; }
+.station-hero { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.station-title-row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.station-title-row h2 { margin: 0; font-size: 1.65rem; }
+.station-description { margin: .3rem 0 0; color: var(--muted); }
+.status-badge { padding: .28rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.status-online { background: #dff3e8; color: #146c43; }
+.status-delayed { background: #fff2d8; color: #8a5a10; }
+.status-offline { background: #fde7e5; color: #9f2c23; }
+.status-unknown { background: #ecefef; color: #5c6867; }
+.range-controls { display: flex; gap: .35rem; flex-wrap: wrap; }
+.range-button { font-size: .74rem; padding: .45rem .65rem; }
+.range-button.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .85rem; margin-bottom: .85rem; }
+.metric-card, .chart-card, .health-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow);
+}
+.metric-card { padding: 1rem; min-width: 0; }
+.metric-primary { border-top: 4px solid var(--accent); }
+.metric-label { display: block; color: var(--muted); font-size: .78rem; font-weight: 700; margin-bottom: .55rem; }
+.metric-value-row { display: flex; align-items: baseline; gap: .3rem; }
+.metric-value { font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1; font-weight: 800; letter-spacing: -.04em; }
+.metric-value-small { font-size: clamp(1.65rem, 3vw, 2.2rem); }
+.metric-unit { color: var(--muted); font-weight: 800; }
+.metric-detail { display: block; margin-top: .65rem; color: var(--muted); font-size: .76rem; min-height: 1.1em; }
+.battery-track { height: 7px; background: #e8eeec; border-radius: 999px; overflow: hidden; margin-top: .65rem; }
+.battery-bar { width: 0; height: 100%; background: var(--accent); transition: width .25s ease; }
+
+.chart-card { padding: 1rem; margin-bottom: .85rem; }
+.chart-header { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: .7rem; }
+.chart-header h3, .health-card h3 { margin: .15rem 0 0; }
+.chart-legend { font-size: .76rem; color: var(--muted); }
+.legend-dot { width: 9px; height: 9px; background: var(--accent); display: inline-block; border-radius: 999px; margin-right: .35rem; }
+.chart-wrap { min-height: 340px; position: relative; }
+#waterChart { width: 100%; height: 340px; display: block; }
+.chart-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+
+.health-card { padding: 1rem; }
+.health-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .75rem; margin-top: .9rem; }
+.health-grid > div { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 10px; padding: .85rem; }
+.health-label { display: block; color: var(--muted); font-size: .72rem; margin-bottom: .25rem; }
+.health-grid strong { font-size: .9rem; overflow-wrap: anywhere; }
+
+.error-banner { background: #fff0ee; color: #8f2d25; border: 1px solid #f0c8c4; border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
+.site-footer { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1rem 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .75rem; background: #eef3f1; }
+
+.chart-grid-line { stroke: #e4ebe9; stroke-width: 1; }
+.chart-axis-label { fill: #6b7c79; font-size: 12px; }
+.chart-line { fill: none; stroke: #16736b; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.chart-area { fill: rgba(22, 115, 107, .10); }
+.chart-point { fill: #16736b; }
+
+@media (max-width: 980px) {
+  .dashboard-shell { grid-template-columns: 1fr; }
+  .station-sidebar { border-right: 0; border-bottom: 1px solid var(--border); }
+  .station-list { display: flex; overflow-x: auto; }
+  .station-button { min-width: 180px; }
+  .metric-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .health-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 640px) {
+  .site-header, .station-hero { align-items: flex-start; flex-direction: column; }
+  .site-header { padding: 1rem; }
+  .header-actions { justify-content: flex-start; }
+  .main-panel { padding: .8rem; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .health-grid { grid-template-columns: 1fr; }
+  .chart-header { align-items: flex-start; flex-direction: column; }
+  .chart-wrap, #waterChart { min-height: 285px; height: 285px; }
+}
+
+.chart-empty[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* ==========================================
+   Dark Mode
+   ========================================== */
+
+:root[data-theme="dark"] {
+  --bg: #111b1a;
+  --panel: #182523;
+  --panel-soft: #1e2e2b;
+  --text: #edf5f3;
+  --muted: #9fb5b1;
+  --border: #324743;
+  --accent: #43a99e;
+  --accent-dark: #d7f3ef;
+  --accent-soft: #203f3b;
+  --shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+
+:root[data-theme="dark"] .station-sidebar {
+  background: #152220;
+}
+
+:root[data-theme="dark"] .station-button.active {
+  background: #21312e;
+}
+
+:root[data-theme="dark"] .site-footer {
+  background: #152220;
+}
+
+:root[data-theme="dark"] .chart-grid-line {
+  stroke: #304340;
+}
+
+:root[data-theme="dark"] .chart-axis-label {
+  fill: #9fb5b1;
+}
+
+:root[data-theme="dark"] .battery-track {
+  background: #324743;
+}
+
+
+/* ==========================================
+   Period Statistics
+   ========================================== */
+
+.period-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: .5rem;
+}
+
+.period-stats div {
+  display: flex;
+  gap: .45rem;
+  align-items: baseline;
+}
+
+.period-stats span {
+  color: var(--muted);
+  font-size: .74rem;
+}
+
+.period-stats strong {
+  font-size: .9rem;
+}
+
+
+/* ==========================================
+   Hydrograph Hover
+   ========================================== */
+
+.chart-tooltip {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+
+  transform:
+    translate(-50%, calc(-100% - 14px));
+
+  background: var(--text);
+  color: var(--panel);
+
+  border-radius: 8px;
+  padding: .5rem .65rem;
+
+  font-size: .76rem;
+  white-space: nowrap;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,.18);
+}
+
+.chart-tooltip strong,
+.chart-tooltip span {
+  display: block;
+}
+
+.chart-tooltip span {
+  margin-top: .2rem;
+}
+
+.chart-hover-line {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.chart-hover-point {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.chart-hover-overlay {
+  cursor: crosshair;
+}
+
+
+/* ==========================================
+   Thresholds
+   ========================================== */
+
+.threshold-action {
+  stroke: #b7791f;
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+}
+
+.threshold-flood {
+  stroke: #b42318;
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+}
+
+.threshold-label {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ==========================================
+   Sidebar Station Status
+   ========================================== */
+
+.station-snapshot {
+  display: flex !important;
+  align-items: center;
+  gap: .4rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.status-dot.status-online {
+  background: var(--good);
+}
+
+.status-dot.status-delayed {
+  background: var(--warn);
+}
+
+.status-dot.status-offline,
+.status-dot.status-unknown {
+  background: var(--bad);
+}
+
+
+/* ==========================================
+   PRINT / PDF - ONE PAGE LANDSCAPE REPORT
+   ========================================== */
+
+@media print {
+
+  @page {
+    size: letter landscape;
+    margin: 0.28in;
+  }
+
+  html,
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+  }
+
+  body {
+    font-size: 10px;
+  }
+
+
+  /* ------------------------------------------
+     Hide screen-only controls
+     ------------------------------------------ */
+
+  .header-actions,
+  .station-sidebar,
+  .range-controls,
+  .site-footer,
+  .error-banner,
+  .chart-tooltip {
+    display: none !important;
+  }
+
+
+  /* ------------------------------------------
+     Overall layout
+     ------------------------------------------ */
+
+  .dashboard-shell {
+    display: block !important;
+    min-height: 0 !important;
+  }
+
+  .main-panel {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+
+  /* ------------------------------------------
+     Header
+     ------------------------------------------ */
+
+  .site-header {
+    display: block !important;
+
+    background: white !important;
+    color: black !important;
+
+    border: 0 !important;
+    border-bottom: 2px solid #333 !important;
+
+    padding: 0 0 0.12in 0 !important;
+    margin: 0 0 0.10in 0 !important;
+  }
+
+  .site-header .eyebrow {
+    color: #444 !important;
+    font-size: 8px !important;
+    margin: 0 !important;
+  }
+
+  .site-header h1 {
+    color: black !important;
+    font-size: 18px !important;
+    line-height: 1.05 !important;
+    margin: 2px 0 !important;
+  }
+
+  .subtitle {
+    color: #444 !important;
+    font-size: 9px !important;
+    margin: 0 !important;
+  }
+
+
+  /* ------------------------------------------
+     Station title
+     ------------------------------------------ */
+
+  .station-hero {
+    display: block !important;
+    margin: 0 0 0.08in 0 !important;
+  }
+
+  .station-title-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.08in !important;
+  }
+
+  .station-title-row h2 {
+    font-size: 15px !important;
+    margin: 0 !important;
+  }
+
+  .station-description {
+    font-size: 8px !important;
+    margin: 2px 0 0 0 !important;
+  }
+
+  .status-badge {
+    font-size: 7px !important;
+    padding: 2px 5px !important;
+
+    border: 1px solid #777 !important;
+
+    background: white !important;
+    color: black !important;
+  }
+
+
+  /* ------------------------------------------
+     Metric cards
+     ------------------------------------------ */
+
+  .metric-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(4, 1fr) !important;
+
+    gap: 0.08in !important;
+
+    margin:
+      0 0 0.08in 0 !important;
+  }
+
+  .metric-card {
+    padding: 0.08in !important;
+
+    border:
+      1px solid #aaa !important;
+
+    border-radius:
+      6px !important;
+
+    box-shadow:
+      none !important;
+
+    min-height:
+      0 !important;
+
+    break-inside:
+      avoid !important;
+  }
+
+  .metric-primary {
+    border-top:
+      2px solid #333 !important;
+  }
+
+  .metric-label {
+    font-size:
+      7px !important;
+
+    margin-bottom:
+      3px !important;
+  }
+
+  .metric-value {
+    font-size:
+      22px !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .metric-value-small {
+    font-size:
+      18px !important;
+  }
+
+  .metric-unit {
+    font-size:
+      9px !important;
+  }
+
+  .metric-detail {
+    font-size:
+      7px !important;
+
+    line-height:
+      1.15 !important;
+
+    margin-top:
+      4px !important;
+
+    min-height:
+      0 !important;
+  }
+
+  .battery-track {
+    height:
+      4px !important;
+
+    margin-top:
+      4px !important;
+  }
+
+
+  /* ------------------------------------------
+     Hydrograph card
+     ------------------------------------------ */
+
+  .chart-card {
+    padding:
+      0.08in !important;
+
+    margin:
+      0 0 0.08in 0 !important;
+
+    border:
+      1px solid #aaa !important;
+
+    border-radius:
+      6px !important;
+
+    box-shadow:
+      none !important;
+
+    break-inside:
+      avoid !important;
+  }
+
+  .chart-header {
+    display:
+      flex !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between !important;
+
+    gap:
+      0.10in !important;
+
+    margin-bottom:
+      0.04in !important;
+  }
+
+  .chart-header h3 {
+    font-size:
+      12px !important;
+
+    margin:
+      0 !important;
+  }
+
+  .chart-header .eyebrow {
+    font-size:
+      7px !important;
+
+    margin:
+      0 !important;
+  }
+
+  .chart-legend {
+    font-size:
+      7px !important;
+  }
+
+
+  /* Period high / low */
+
+  .period-stats {
+    display:
+      flex !important;
+
+    gap:
+      0.18in !important;
+
+    margin-top:
+      0 !important;
+  }
+
+  .period-stats div {
+    gap:
+      3px !important;
+  }
+
+  .period-stats span {
+    font-size:
+      7px !important;
+  }
+
+  .period-stats strong {
+    font-size:
+      9px !important;
+  }
+
+
+  /* ------------------------------------------
+     Make chart short enough for one page
+     ------------------------------------------ */
+
+  .chart-wrap {
+    height:
+      2.45in !important;
+
+    min-height:
+      2.45in !important;
+  }
+
+  #waterChart {
+    width:
+      100% !important;
+
+    height:
+      2.45in !important;
+
+    min-height:
+      2.45in !important;
+
+    display:
+      block !important;
+  }
+
+  .chart-line {
+    stroke:
+      #000 !important;
+
+    stroke-width:
+      2 !important;
+  }
+
+  .chart-point {
+    fill:
+      #000 !important;
+  }
+
+  .chart-area {
+    fill:
+      rgba(0,0,0,.05) !important;
+  }
+
+  .chart-grid-line {
+    stroke:
+      #ccc !important;
+  }
+
+  .chart-axis-label {
+    fill:
+      #333 !important;
+
+    font-size:
+      10px !important;
+  }
+
+  .chart-hover-line,
+  .chart-hover-point,
+  .chart-hover-overlay {
+    display:
+      none !important;
+  }
+
+
+  /* ------------------------------------------
+     Station health / details
+     ------------------------------------------ */
+
+  .health-card {
+    padding:
+      0.07in !important;
+
+    margin:
+      0 !important;
+
+    border:
+      1px solid #aaa !important;
+
+    border-radius:
+      6px !important;
+
+    box-shadow:
+      none !important;
+
+    break-inside:
+      avoid !important;
+  }
+
+  .health-card h3 {
+    font-size:
+      11px !important;
+
+    margin:
+      0 !important;
+  }
+
+  .health-card .eyebrow {
+    font-size:
+      7px !important;
+
+    margin:
+      0 !important;
+  }
+
+  .health-grid {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(4, 1fr) !important;
+
+    gap:
+      0.06in !important;
+
+    margin-top:
+      0.05in !important;
+  }
+
+  .health-grid > div {
+    padding:
+      0.05in !important;
+
+    background:
+      white !important;
+
+    border:
+      1px solid #ccc !important;
+
+    border-radius:
+      4px !important;
+  }
+
+  .health-label {
+    font-size:
+      7px !important;
+
+    margin-bottom:
+      2px !important;
+  }
+
+  .health-grid strong {
+    font-size:
+      8px !important;
+  }
+
+
+  /* ------------------------------------------
+     Prevent accidental page breaks
+     ------------------------------------------ */
+
+  .station-hero,
+  .metric-grid,
+  .chart-card,
+  .health-card {
+    page-break-inside:
+      avoid !important;
+
+    break-inside:
+      avoid !important;
+  }
+}
